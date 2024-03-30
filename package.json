@@ -4,23 +4,29 @@
     "version": "0.0.0",
     "type": "module",
     "scripts": {
+        "start": "vite --open",
         "dev": "vite",
         "build": "tsc && vite build",
         "eslint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
         "lint": "prettier . --write && npm run eslint",
         "lint:fix": "prettier . --write && npm run eslint -- --fix",
         "preview": "vite preview",
-        "prepare": "husky install"
+        "pre-commit": "lint-staged",
+        "prepare": "husky install",
+        "prettier": "prettier . --write"
     },
     "dependencies": {
+        "@types/react-router-dom": "^5.3.3",
         "bootstrap": "^5.3.3",
+        "firebase": "^10.10.0",
         "react": "^18.2.0",
-        "react-dom": "^18.2.0"
+        "react-dom": "^18.2.0",
+        "react-router-dom": "^6.22.3"
     },
     "devDependencies": {
         "@playwright/test": "^1.42.1",
         "@types/node": "^20.11.30",
-        "@types/react": "^18.2.64",
+        "@types/react": "^18.2.73",
         "@types/react-dom": "^18.2.21",
         "@vitejs/plugin-react": "^4.2.1",
         "eslint": "^8.57.0",
