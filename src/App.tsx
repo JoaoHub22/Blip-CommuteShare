@@ -4,7 +4,7 @@ import { useContext, useEffect } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 
 import { AuthContext } from './context/auth-context';
-/*import RequireAuth from './components/require-auth.tsx';*/
+// import RequireAuth from './components/require-auth.tsx';
 import imagePath from './assets/your_image_icon.png';
 import NavBar from './components/navbar';
 import Home from './pages/Home.tsx';
@@ -32,7 +32,7 @@ function App() {
                 <NavBar brandName="CommuteShare" imageSrcPath={imagePath} navItems={items} />
             </div>
             <Routes>
-                <Route index element={<Home />} />
+                <Route path="Home" element={<Home />} />
                 <Route path="Login" element={<Login />} />
                 <Route path="Register" element={<Register />} />
             </Routes>
