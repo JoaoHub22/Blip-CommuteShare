@@ -46,11 +46,13 @@ function NavBar({ brandName, imageSrcPath, navItems }: NavBarProps) {
                             </li>
                         ))}
                     </ul>
-                    <li className="nav-item">
-                        <a className="nav-link" href="/Login">
-                            Login
-                        </a>
-                    </li>
+                    <a className="nav-link" href="/Login">
+                        Login
+                    </a>
+                    <a>| </a>
+                    <a className="nav-link" href="/Register">
+                        Register
+                    </a>
                 </div>
             </div>
         </nav>
