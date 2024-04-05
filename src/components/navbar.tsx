@@ -1,3 +1,7 @@
+import { useContext } from 'react';
+
+import { AuthContext } from '../context/auth-context';
+
 import '../App.css';
 
 interface NavBarProps {
@@ -7,6 +11,13 @@ interface NavBarProps {
 }
 
 function NavBar({ brandName, imageSrcPath }: NavBarProps) {
+    const { currentUser } = useContext(AuthContext);
+    let isLoggedIn = false;
+
+    if (currentUser != null) {
+        isLoggedIn = true;
+    }
+
     return (
         <nav className="navbar navbar-expand-md navbar-light bg-white shadow">
             <div className="container-fluid">
@@ -44,11 +55,12 @@ function NavBar({ brandName, imageSrcPath }: NavBarProps) {
                             Histórico
                         </a>
                     </ul>
+
                     <a className="nav-link" href="/Login">
-                        Login
+                        {isLoggedIn ? <></> : <>Login</>}
                     </a>
                     <a className="nav-link" href="/Register">
-                        Register
+                        {isLoggedIn ? <></> : <>Register</>}
                     </a>
                 </div>
             </div>
