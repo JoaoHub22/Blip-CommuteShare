@@ -9,6 +9,9 @@ import {
     User,
     createUserWithEmailAndPassword
 } from 'firebase/auth';
+//import firebase from 'firebase/compat/app';
+// Required for side-effects
+import 'firebase/firestore';
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries

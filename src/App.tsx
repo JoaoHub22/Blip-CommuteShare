@@ -10,6 +10,9 @@ import NavBar from './components/navbar';
 import Home from './pages/Home.tsx';
 import Login from './pages/Login.tsx';
 import Register from './pages/Register.tsx';
+import Viagens from './pages/Viagens.tsx';
+import Histórico from './pages/Histórico.tsx';
+import Adicionar from './pages/Adicionar.tsx';
 
 function App() {
     const items = ['Página Principal', 'Boleias', 'Histórico'];
@@ -33,8 +36,11 @@ function App() {
             </div>
             <Routes>
                 <Route path="Home" element={<Home />} />
+                <Route path="Viagens" element={<Viagens />} />
+                <Route path="Adicionar" element={<Adicionar />} />
                 <Route path="Login" element={<Login />} />
                 <Route path="Register" element={<Register />} />
+                <Route path="Histórico" element={<Histórico />} />
             </Routes>
         </>
     );

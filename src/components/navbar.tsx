@@ -11,7 +11,7 @@ interface NavBarProps {
 }
 
 function NavBar({ brandName, imageSrcPath }: NavBarProps) {
-    const { currentUser } = useContext(AuthContext);
+    const { currentUser, signOut } = useContext(AuthContext);
     let isLoggedIn = false;
 
     if (currentUser != null) {
@@ -47,11 +47,11 @@ function NavBar({ brandName, imageSrcPath }: NavBarProps) {
                             Página Principal
                         </a>
                         {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-                        <a className="nav-link" href="#">
-                            Boleias
+                        <a className="nav-link" href="/Viagens">
+                            Viagens
                         </a>
                         {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-                        <a className="nav-link" href="#">
+                        <a className="nav-link" href="/Histórico">
                             Histórico
                         </a>
                     </ul>
@@ -62,6 +62,8 @@ function NavBar({ brandName, imageSrcPath }: NavBarProps) {
                     <a className="nav-link" href="/Register">
                         {isLoggedIn ? <></> : <>Register</>}
                     </a>
+                    {/* Não deve ser um botão */}
+                    <button onClick={signOut}>{isLoggedIn ? <>Sign Out</> : <></>} </button>
                 </div>
             </div>
         </nav>

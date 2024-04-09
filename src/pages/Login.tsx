@@ -89,42 +89,6 @@ function Login() {
                 </form>
             </main>
         </div>
-        // <>
-        //     <div>
-        //         <h3>Página Login</h3>
-        //     </div>
-        //     <div className="App">
-        //         <div className="card">
-        //             <form onSubmit={handleSubmit}>
-        //                 <div>
-        //                     <input
-        //                         className="InputEmail"
-        //                         type="email"
-        //                         name="email"
-        //                         value={email}
-        //                         onChange={handleChange}
-        //                         placeholder="Email"
-        //                         required
-        //                     />
-        //                 </div>
-        //                 <div>
-        //                     <input
-        //                         className="InputPassword"
-        //                         type="password"
-        //                         name="password"
-        //                         value={password}
-        //                         onChange={handleChange}
-        //                         placeholder="Password"
-        //                         required
-        //                     />
-        //                 </div>
-        //                 <div>
-        //                     <input className="Button" id="recaptcha" type="submit" value="Login" />
-        //                 </div>
-        //             </form>
-        //         </div>
-        //     </div>
-        // </>
     );
 }
 
