@@ -4,10 +4,15 @@ function Viagens() {
     const dropDownButton = document.querySelector('#dropdownHere');
     const buttons = document.querySelectorAll('.dropdown-item');
 
-    for (const button of buttons) {
-        button.addEventListener('click', event => {
-            dropDownButton.textContent = event.target.value;
-        });
+    if (dropDownButton != null && buttons != null) {
+        for (const button of buttons) {
+            button.addEventListener('click', event => {
+                if (event.target != null) {
+                    //@ts-ignore
+                    dropDownButton.textContent = event.target.value;
+                }
+            });
+        }
     }
 
     return (
