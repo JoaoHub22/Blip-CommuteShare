@@ -1,4 +1,5 @@
 import { useContext } from 'react';
+import { Link } from 'react-router-dom';
 
 import { AuthContext } from '../context/auth-context';
 
@@ -21,10 +22,10 @@ function NavBar({ brandName, imageSrcPath }: NavBarProps) {
     return (
         <nav className="navbar navbar-expand-md navbar-light bg-white shadow">
             <div className="container-fluid">
-                <a className="navbar-brand" href="/Home">
+                <Link className="navbar-brand" to="Home">
                     <img src={imageSrcPath} alt="" width="60" height="60" className="d-inline-block align-center" />
                     <span className="fw-bolder sf-4">{brandName}</span>
-                </a>
+                </Link>
                 <button
                     className="navbar-toggler"
                     type="button"
@@ -43,25 +44,25 @@ function NavBar({ brandName, imageSrcPath }: NavBarProps) {
                     id="navbarSupportedContent"
                 >
                     <ul className="navbar-nav me-auto mb-2 mb-md-1">
-                        <a className="nav-link" href="/Home">
+                        <Link className="nav-link" to="Home">
                             Página Principal
-                        </a>
+                        </Link>
                         {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-                        <a className="nav-link" href="/Viagens">
+                        <Link className="nav-link" to="Viagens">
                             Viagens
-                        </a>
+                        </Link>
                         {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-                        <a className="nav-link" href="/Histórico">
+                        <Link className="nav-link" to="Histórico">
                             Histórico
-                        </a>
+                        </Link>
                     </ul>
 
-                    <a className="nav-link" href="/Login">
+                    <Link className="nav-link" to="Login">
                         {isLoggedIn ? <></> : <>Login</>}
-                    </a>
-                    <a className="nav-link" href="/Register">
+                    </Link>
+                    <Link className="nav-link" to="Register">
                         {isLoggedIn ? <></> : <>Register</>}
-                    </a>
+                    </Link>
                     {/* Não deve ser um botão */}
                     <button onClick={signOut}>{isLoggedIn ? <>Sign Out</> : <></>} </button>
                 </div>
