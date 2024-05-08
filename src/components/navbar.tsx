@@ -77,7 +77,7 @@ function NavBar({ brandName, imageSrcPath }: NavBarProps) {
                     </Link>
                     <Link className="nav-link" to="Perfil">
                         {isLoggedIn ? <img src={ImagemPerfil} alt="" width="40" height="40" /> : <></>}
-
+                        {/*@ts-ignore */}
                         {isLoggedIn ? <>{currentUser.email}</> : <></>}
                     </Link>
                     {/* Não deve ser um botão */}

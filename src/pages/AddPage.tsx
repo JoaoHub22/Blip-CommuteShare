@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import DatePicker from 'react-datepicker';
-import { useContext, useState } from 'react';
+import { SetStateAction, useContext, useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import { addDoc, collection, getFirestore } from 'firebase/firestore';
 
@@ -30,6 +30,7 @@ function AddTripRequest() {
                 destino: destination,
                 date: date,
                 hora: hour,
+                //@ts-ignore
                 utilizador: currentUser.email,
                 seatingcapacity: seatingcapacity
             });
@@ -40,12 +41,13 @@ function AddTripRequest() {
                 destino: destination,
                 date: date,
                 hora: hour,
+                //@ts-ignore
                 utilizador: currentUser.email
             });
         }
     };
 
-    const handleChange = date => {
+    const handleChange = (date: SetStateAction<Date>) => {
         setDate(date);
     };
 
@@ -69,6 +71,7 @@ function AddTripRequest() {
             </select>
             <h3>Data</h3>
             <div>
+                {/*@ts-ignore */}
                 <DatePicker id="Date" showTimeSelect selected={date} onChange={handleChange} />
             </div>
             <h3>Nº de lugares</h3>

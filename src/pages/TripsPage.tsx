@@ -32,11 +32,13 @@ function Trips() {
             setIsLoading(true);
 
             const grupo = onSnapshot(ListaViagens, querySnapshot => {
+                //@ts-ignore
                 const items = [];
 
                 querySnapshot.forEach(doc => {
                     items.push(doc.data());
                 });
+                //@ts-ignore
                 setViagens(items);
                 setIsLoading(false);
             });
@@ -52,11 +54,13 @@ function Trips() {
             setIsLoading(true);
 
             const grupo = onSnapshot(ListaPedidosBoleia, querySnapshot => {
+                //@ts-ignore
                 const items = [];
 
                 querySnapshot.forEach(doc => {
                     items.push(doc.data());
                 });
+                //@ts-ignore
                 setBoleias(items);
                 setIsLoading(false);
             });
@@ -135,6 +139,7 @@ function Trips() {
                         <ul className="list-group">
                             {viagens
                                 .filter(viagem => {
+                                    //@ts-ignore
                                     return viagem.utilizador === currentUser.email;
                                 })
                                 .map(viagem => {
@@ -161,6 +166,7 @@ function Trips() {
                         <ul className="list-group">
                             {boleias
                                 .filter(boleia => {
+                                    //@ts-ignore
                                     return boleia.utilizador === currentUser.email;
                                 })
                                 .map(boleia => {
