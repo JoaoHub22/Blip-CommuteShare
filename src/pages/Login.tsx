@@ -85,7 +85,6 @@ function Login() {
                     <button className="btn btn-primary w-100 py-2" type="submit">
                         Sign in
                     </button>
-                    <p className="mt-5 mb-3 text-body-secondary">© 2017–2024</p>
                 </form>
             </main>
         </div>

@@ -1,7 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import { useContext, useEffect } from 'react';
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import { useContext } from 'react';
+import { Routes, Route } from 'react-router-dom';
 
 import { AuthContext } from './context/auth-context';
 // import RequireAuth from './components/require-auth.tsx';
@@ -10,24 +10,24 @@ import NavBar from './components/navbar';
 import Home from './pages/Home.tsx';
 import Login from './pages/Login.tsx';
 import Register from './pages/Register.tsx';
-import Viagens from './pages/Viagens.tsx';
-import Histórico from './pages/Histórico.tsx';
-import Adicionar from './pages/Adicionar.tsx';
+import Viagens from './pages/TripsPage.tsx';
+import Histórico from './pages/Historic.tsx';
+import Adicionar from './pages/AddPage.tsx';
+import Perfil from './pages/Profile.tsx';
 
 function App() {
     const items = ['Página Principal', 'Boleias', 'Histórico'];
     const { currentUser } = useContext(AuthContext);
-    const navigate = useNavigate();
 
     // eslint-disable-next-line no-console
     console.log('User:', !!currentUser);
 
     // Check if the current user exists on the initial render.
-    useEffect(() => {
-        if (currentUser) {
-            navigate('/Home');
-        }
-    }, [currentUser, navigate]);
+    // useEffect(() => {
+    //     if (currentUser) {
+    //         navigate('/Home');
+    //     }
+    // }, [currentUser, navigate]);
 
     return (
         <>
@@ -41,6 +41,7 @@ function App() {
                 <Route path="Login" element={<Login />} />
                 <Route path="Register" element={<Register />} />
                 <Route path="Histórico" element={<Histórico />} />
+                <Route path="Perfil" element={<Perfil />} />
             </Routes>
         </>
     );

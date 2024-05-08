@@ -2,6 +2,7 @@ import { useContext } from 'react';
 import { Link } from 'react-router-dom';
 
 import { AuthContext } from '../context/auth-context';
+import ImagemPerfil from '../assets/profile-circle-icon-2048x2048-cqe5466q.png';
 
 import '../App.css';
 
@@ -56,15 +57,37 @@ function NavBar({ brandName, imageSrcPath }: NavBarProps) {
                             Histórico
                         </Link>
                     </ul>
-
                     <Link className="nav-link" to="Login">
-                        {isLoggedIn ? <></> : <>Login</>}
+                        {isLoggedIn ? (
+                            <></>
+                        ) : (
+                            <button type="button" className="btn btn-outline-primary me-2">
+                                Login
+                            </button>
+                        )}
                     </Link>
                     <Link className="nav-link" to="Register">
-                        {isLoggedIn ? <></> : <>Register</>}
+                        {isLoggedIn ? (
+                            <></>
+                        ) : (
+                            <button type="button" className="btn btn-primary">
+                                Register
+                            </button>
+                        )}
+                    </Link>
+                    <Link className="nav-link" to="Perfil">
+                        {isLoggedIn ? <img src={ImagemPerfil} alt="" width="40" height="40" /> : <></>}
+
+                        {isLoggedIn ? <>{currentUser.email}</> : <></>}
                     </Link>
                     {/* Não deve ser um botão */}
-                    <button onClick={signOut}>{isLoggedIn ? <>Sign Out</> : <></>} </button>
+                    {isLoggedIn ? (
+                        <button type="button" className="btn btn-outline-primary me-2" onClick={signOut}>
+                            Sign Out
+                        </button>
+                    ) : (
+                        <></>
+                    )}{' '}
                 </div>
             </div>
         </nav>
