@@ -1,4 +1,4 @@
-import './Histórico.scss';
+import './Historic.scss';
 
 function Viagens() {
     const dropDownButton = document.querySelector('#dropdownHere');

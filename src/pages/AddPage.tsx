@@ -26,7 +26,7 @@ function AddTripRequest() {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         if (tipo == 'Viagem') {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const newTrip = await addDoc(ListaViagens, {
+            addDoc(ListaViagens, {
                 destino: destination,
                 date: date,
                 hora: hour,
@@ -37,7 +37,7 @@ function AddTripRequest() {
         }
         if (tipo == 'Boleia') {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const newCarRideRequest = await addDoc(ListaPedidosBoleia, {
+            addDoc(ListaPedidosBoleia, {
                 destino: destination,
                 date: date,
                 hora: hour,
