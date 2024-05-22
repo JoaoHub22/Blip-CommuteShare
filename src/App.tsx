@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import { useContext, useEffect } from 'react';
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 
-import { AuthContext } from './context/auth-context';
+// import { AuthContext } from './context/auth-context';
 // import RequireAuth from './components/require-auth.tsx';
 import imagePath from './assets/your_image_icon.png';
 import NavBar from './components/navbar';
@@ -19,8 +18,8 @@ import Perfil from './pages/Profile.tsx';
 
 function App() {
     const items = ['Página Principal', 'Boleias', 'Histórico'];
-    const { currentUser } = useContext(AuthContext);
-    const navigate = useNavigate();
+    // const { currentUser } = useContext(AuthContext);
+    // const navigate = useNavigate();
 
     //Check if the current user exists on the initial render.
     // useEffect(() => {
