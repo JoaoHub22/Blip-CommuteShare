@@ -1,56 +1,81 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import DatePicker from 'react-datepicker';
-import { v4 as uuid } from 'uuid';
-import { SetStateAction, useContext, useState } from 'react';
+import { SetStateAction, useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
-import { addDoc, collection, getFirestore } from 'firebase/firestore';
-import { Link } from 'react-router-dom';
+import { collection, doc, getDocs, getFirestore, query, updateDoc, where } from 'firebase/firestore';
+import { Link, useLocation, useParams } from 'react-router-dom';
 
-import { AuthContext } from '../context/auth-context';
+import './EditPage.scss';
 
-import './AddPage.scss';
-
-function AddTripRequest() {
-    const id = uuid();
-    const [destination, setDestination] = useState('');
-    const [pickuplocation, setPickuplocation] = useState('');
-    const [seatingcapacity, setSeatingcapacity] = useState('');
-    const [frequency, setFrequency] = useState('');
+function EditTripRequest() {
+    const location = useLocation();
+    const { tipo } = useParams();
+    const id = location.state.id;
+    const [destination, setDestination] = useState(location.state.destination);
+    const [pickuplocation, setPickuplocation] = useState(location.state.pickuplocation);
+    const [seatingcapacity, setSeatingcapacity] = useState(location.state.seatingcapacity);
+    const [frequency, setFrequency] = useState(location.state.frequency);
     const dropDownButton = document.querySelector('#dropdownHere');
     const buttons = document.querySelectorAll('.dropdown-item');
     const [date, setDate] = useState(new Date());
-    const [tipo, setTipo] = useState('Viagem');
-    const [startingpoint, setStartingpoint] = useState('');
+    const [startingpoint, setStartingpoint] = useState(location.state.startingpoint);
     const firestore = getFirestore();
     const ListaViagens = collection(firestore, 'Viagens');
     const ListaPedidosBoleia = collection(firestore, 'PedidosBoleia');
-    const { currentUser } = useContext(AuthContext);
-    const AddTrip = async () => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        if (tipo == 'Viagem') {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            addDoc(ListaViagens, {
-                id: id,
-                startingpoint: startingpoint,
-                destination: destination,
-                date: date,
-                frequency: frequency,
-                //@ts-ignore
-                user: currentUser.email,
-                seatingcapacity: seatingcapacity
-            });
+
+    const EditTrip = async () => {
+        if (tipo === 'Viagem') {
+            try {
+                const grupoteste = query(ListaViagens, where('id', '==', id));
+                const querySnapshot = await getDocs(grupoteste);
+
+                let docID = null;
+
+                querySnapshot.forEach(doc => {
+                    docID = doc.id;
+                });
+
+                if (docID) {
+                    const docRef = doc(ListaViagens, docID);
+
+                    await updateDoc(docRef, {
+                        startingpoint: startingpoint,
+                        destination: destination,
+                        date: date,
+                        frequency: frequency,
+                        seatingcapacity: seatingcapacity
+                    });
+                }
+            } catch (ex) {
+                // eslint-disable-next-line no-console
+                console.log(ex);
+            }
         }
-        if (tipo == 'Boleia') {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            addDoc(ListaPedidosBoleia, {
-                id: id,
-                pickuplocation: pickuplocation,
-                destination: destination,
-                date: date,
-                frequency: frequency,
-                //@ts-ignore
-                user: currentUser.email
-            });
+        if (tipo === 'Boleia') {
+            try {
+                const grupoteste = query(ListaPedidosBoleia, where('id', '==', id));
+                const querySnapshot = await getDocs(grupoteste);
+
+                let docID = null;
+
+                querySnapshot.forEach(doc => {
+                    docID = doc.id;
+                });
+
+                if (docID) {
+                    const docRef = doc(ListaPedidosBoleia, docID);
+
+                    await updateDoc(docRef, {
+                        pickuplocation: pickuplocation,
+                        destination: destination,
+                        date: date,
+                        frequency: frequency
+                    });
+                }
+            } catch (ex) {
+                // eslint-disable-next-line no-console
+                console.log(ex);
+            }
         }
     };
 
@@ -71,10 +96,6 @@ function AddTripRequest() {
 
     return (
         <div className="container">
-            <select className="form-select" aria-label="Default select example" onChange={e => setTipo(e.currentTarget.value)}>
-                <option value="Viagem">Viagem</option>
-                <option value="Boleia">Boleia</option>
-            </select>
             <h3>Data</h3>
             <div>
                 {/*@ts-ignore */}
@@ -83,7 +104,7 @@ function AddTripRequest() {
             {tipo === 'Viagem' && (
                 <>
                     <h3>Nº de lugares</h3>
-                    <input className="input-group" onChange={e => setSeatingcapacity(e.currentTarget.value)}></input>
+                    <input className="input-group" value={seatingcapacity} onChange={e => setSeatingcapacity(e.currentTarget.value)}></input>
                 </>
             )}
             <h3>Frequência</h3>
@@ -93,6 +114,7 @@ function AddTripRequest() {
                     type="radio"
                     name="flexRadioDefault"
                     id="flexRadioDefault1"
+                    checked={frequency === 'Única vez'}
                     value="Única vez"
                     onChange={e => setFrequency(e.currentTarget.value)}
                 />
@@ -106,6 +128,7 @@ function AddTripRequest() {
                     type="radio"
                     name="flexRadioDefault"
                     id="flexRadioDefault2"
+                    checked={frequency === 'Todas as semanas'}
                     value="Todas as semanas"
                     onChange={e => setFrequency(e.currentTarget.value)}
                 />
@@ -119,6 +142,7 @@ function AddTripRequest() {
                     type="radio"
                     name="flexRadioDefault"
                     id="flexRadioDefault2"
+                    checked={frequency === 'Todos os dias'}
                     value="Todos os dias"
                     onChange={e => setFrequency(e.currentTarget.value)}
                 />
@@ -140,31 +164,27 @@ function AddTripRequest() {
             {tipo === 'Viagem' && (
                 <>
                     <h3>Ponto de Partida</h3>
-                    <input className="input-group" onChange={e => setStartingpoint(e.currentTarget.value)}></input>
+                    <input className="input-group" value={startingpoint} onChange={e => setStartingpoint(e.currentTarget.value)}></input>
                 </>
             )}
 
             {tipo === 'Boleia' && (
                 <>
                     <h3>Local para apanhar</h3>
-                    <input className="input-group" onChange={e => setPickuplocation(e.currentTarget.value)}></input>
+                    <input className="input-group" value={pickuplocation} onChange={e => setPickuplocation(e.currentTarget.value)}></input>
                 </>
             )}
 
             <h3>Destino</h3>
-            <input className="input-group" onChange={e => setDestination(e.currentTarget.value)}></input>
+            <input className="input-group" value={destination} onChange={e => setDestination(e.currentTarget.value)}></input>
 
-            <Link to="/Viagens">
-                <button id="ButConf" onClick={() => AddTrip()}>
-                    Confimar
-                </button>
-            </Link>
-
+            <button id="ButConf" onClick={() => EditTrip()}>
+                Confimar
+            </button>
             <Link to="/Viagens">
                 <button id="ButCanc">Cancelar</button>
             </Link>
         </div>
     );
 }
-
-export default AddTripRequest;
+export default EditTripRequest;

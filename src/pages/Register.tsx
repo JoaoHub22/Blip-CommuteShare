@@ -2,6 +2,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useState, ChangeEvent, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { addDoc, collection, getFirestore } from 'firebase/firestore';
 
 import { CreateAccount } from '../firebase.ts';
 import '.././App.css';
@@ -15,6 +16,9 @@ const defaultFormFields = {
 
 function Register() {
     const [formFields, setFormFields] = useState(defaultFormFields);
+    const firestore = getFirestore();
+    const ListaPerfis = collection(firestore, 'Profiles');
+    const [username, setUsername] = useState();
     const { email, password } = formFields;
     const navigate = useNavigate();
 
@@ -33,6 +37,9 @@ function Register() {
                 resetFormFields();
                 navigate('/profile');
             }
+
+            addDoc(ListaPerfis, { description: '', email: email, username: username });
+
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             // eslint-disable-next-line no-console
@@ -52,6 +59,18 @@ function Register() {
                 <main className="form-signin w-100 m-auto">
                     <form onSubmit={handleSubmit}>
                         <h1 className="h3 mb-3 fw-normal">Please register Account</h1>
+
+                        <div className="form-floating">
+                            <input
+                                type="username"
+                                name="username"
+                                value={username}
+                                onChange={e => setUsername(e.currentTarget.value)}
+                                className="form-control"
+                                placeholder="Username"
+                            />
+                            <label htmlFor="floatingUsername">Username</label>
+                        </div>
 
                         <div className="form-floating">
                             <input
