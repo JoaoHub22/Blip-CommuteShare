@@ -65,6 +65,7 @@ function Register() {
                                 type="username"
                                 name="username"
                                 value={username}
+                                //@ts-ignore
                                 onChange={e => setUsername(e.currentTarget.value)}
                                 className="form-control"
                                 placeholder="Username"
