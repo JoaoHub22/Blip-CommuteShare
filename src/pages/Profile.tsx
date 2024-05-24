@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 //@ts-nocheck
 import { useContext, useEffect, useState } from 'react';
-import { collection, query, where, getDocs, getFirestore } from 'firebase/firestore';
+import { collection, query, where, updateDoc, getDocs, getFirestore } from 'firebase/firestore';
 
 import { AuthContext } from '../context/auth-context';
 import ImagemPerfil from '../assets/profile-circle-icon-2048x2048-cqe5466q.png';
@@ -21,8 +21,35 @@ function Profile() {
     const [isLoading, setIsLoading] = useState(false);
     const [profile, setProfile] = useState<Profiles[]>([]);
     const ProfileList = collection(firestore, 'Profiles');
-
+    const [description, setDescription] = useState();
+    const [username, setUsername] = useState();
     const [Editmode, setEditmode] = useState(false);
+
+    const SaveProfile = async () => {
+        try {
+            const grupoteste = query(ProfileList, where('email', '==', currentUser.email));
+            const querySnapshot = await getDocs(grupoteste);
+
+            let docID = null;
+
+            querySnapshot.forEach(doc => {
+                docID = doc.id;
+            });
+
+            if (docID) {
+                const docRef = doc(ProfileList, docID);
+
+                await updateDoc(docRef, {
+                    description: description,
+                    username: username
+                });
+            }
+            setEditmode(false);
+        } catch (ex) {
+            // eslint-disable-next-line no-console
+            console.log(ex);
+        }
+    };
 
     useEffect(() => {
         const handleGetProfile = async () => {
@@ -56,20 +83,25 @@ function Profile() {
                                 return (
                                     <>
                                         {Editmode ? (
-                                            <>
+                                            <li className="list-group-item" key={perfil.id}>
+                                                <h3>Nome de utilizador:</h3>
+                                                <input className="input-group" onChange={e => setUsername(e.currentTarget.value)}>
+                                                    {username}
+                                                </input>
+                                                <h3>Descrição:</h3>
+                                                <input className="input-group" onChange={e => setDescription(e.currentTarget.value)}>
+                                                    {description}
+                                                </input>
+                                                <button onClick={() => SaveProfile()}>Confirmar</button>
+                                                <button onClick={() => setEditmode(false)}>Cancelar</button>
+                                            </li>
+                                        ) : (
+                                            <li className="list-group-item" key={perfil.id}>
                                                 <h2>{perfil.username}</h2>
                                                 <h3>Descrição:</h3>
                                                 <div>{perfil.description}</div>
-                                                <button>Confirmar</button>
-                                                <button>Cancelar</button>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <h2>Utilizador:{perfil.username}</h2>
-                                                <h3>Descrição:</h3>
-                                                <div>{perfil.description}</div>
-                                                <button>Editar</button>
-                                            </>
+                                                <button onClick={() => setEditmode(true)}>Editar</button>
+                                            </li>
                                         )}
                                     </>
                                 );

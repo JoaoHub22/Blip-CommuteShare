@@ -1,10 +1,20 @@
-import { useContext } from 'react';
+//@ts-nocheck
+
+import { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { collection, getDocs, getFirestore, query, where } from 'firebase/firestore';
 
 import { AuthContext } from '../context/auth-context';
 import ImagemPerfil from '../assets/profile-circle-icon-2048x2048-cqe5466q.png';
 
 import '../App.css';
+
+interface Profiles {
+    id: string;
+    description: string;
+    email: string;
+    username: string;
+}
 
 interface NavBarProps {
     brandName: string;
@@ -14,11 +24,33 @@ interface NavBarProps {
 
 function NavBar({ brandName, imageSrcPath }: NavBarProps) {
     const { currentUser, signOut } = useContext(AuthContext);
+    const firestore = getFirestore();
+    const [profile, setProfile] = useState<Profiles[]>([]);
+    const ProfileList = collection(firestore, 'Profiles');
     let isLoggedIn = false;
 
     if (currentUser != null) {
         isLoggedIn = true;
     }
+
+    useEffect(() => {
+        const handleGetProfile = async () => {
+            const items = [];
+            const grupoteste = query(ProfileList, where('email', '==', currentUser.email));
+            const querySnapshot = await getDocs(grupoteste);
+
+            querySnapshot.forEach(doc => {
+                items.push(doc.data());
+            });
+            setProfile(items);
+
+            return () => {
+                grupo();
+            };
+        };
+
+        handleGetProfile();
+    }, []);
 
     return (
         <nav className="navbar navbar-expand-md navbar-light bg-white shadow">
@@ -78,7 +110,15 @@ function NavBar({ brandName, imageSrcPath }: NavBarProps) {
                     <Link className="nav-link" to="Perfil">
                         {isLoggedIn ? <img src={ImagemPerfil} alt="" width="40" height="40" /> : <></>}
                         {/*@ts-ignore */}
-                        {isLoggedIn ? <>{currentUser.email}</> : <></>}
+                        {isLoggedIn ? (
+                            <>
+                                {profile.map(perfil => {
+                                    return <>{perfil.username}</>;
+                                })}
+                            </>
+                        ) : (
+                            <></>
+                        )}
                     </Link>
                     {/* Não deve ser um botão */}
                     {isLoggedIn ? (
