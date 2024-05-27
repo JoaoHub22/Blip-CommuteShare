@@ -15,6 +15,8 @@ import Histórico from './pages/Historic.tsx';
 import Adicionar from './pages/AddPage.tsx';
 import Editar from './pages/EditPage.tsx';
 import Perfil from './pages/Profile.tsx';
+import PedirBoleia from './pages/RequestRidePage.tsx';
+import OferecerBoleia from './pages/OfferRidePage.tsx';
 
 function App() {
     const items = ['Página Principal', 'Boleias', 'Histórico'];
@@ -43,6 +45,8 @@ function App() {
                 <Route path="Register" element={<Register />} />
                 <Route path="Histórico" element={<Histórico />} />
                 <Route path="Perfil" element={<Perfil />} />
+                <Route path="PedirBoleia" element={<PedirBoleia />} />
+                <Route path="OferecerBoleia" element={<OferecerBoleia />} />
             </Routes>
         </>
     );

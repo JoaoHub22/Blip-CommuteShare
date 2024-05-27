@@ -16,6 +16,7 @@ interface DetalhesViagem {
     frequency: string;
     //@ts-ignore
     user: string;
+    occupiedseats: number;
     seatingcapacity: number;
 }
 
@@ -171,7 +172,12 @@ function Trips() {
                                             <div>Data: {new Date(Number(`${viagem.date.seconds}000`)).toLocaleString('PT-PT')}</div>
                                             <div>Ponto de partida:{viagem.startingpoint}</div>
                                             <div>Destino:{viagem.destination}</div>
-                                            <div>Lugares:{viagem.seatingcapacity}</div>
+                                            <div>
+                                                Lugares:{viagem.occupiedseats}/{viagem.seatingcapacity}
+                                            </div>
+                                            <Link to="/PedirBoleia" state={viagem}>
+                                                <button>Pedir boleia</button>
+                                            </Link>
                                         </li>
                                     );
                                 })}
@@ -195,6 +201,9 @@ function Trips() {
                                         <div>Data: {new Date(Number(`${boleia.date.seconds}000`)).toLocaleString('PT-PT')}</div>
                                         <div>Local para apanhar:{boleia.pickuplocation}</div>
                                         <div>Destino:{boleia.destination}</div>
+                                        <Link to="/OferecerBoleia" state={boleia}>
+                                            <button>Oferecer boleia</button>
+                                        </Link>
                                     </li>
                                 );
                             })}
@@ -223,7 +232,9 @@ function Trips() {
                                             <div>Data: {new Date(Number(`${viagem.date.seconds}000`)).toLocaleString('PT-PT')}</div>
                                             <div>Ponto de partida:{viagem.startingpoint}</div>
                                             <div>Destino:{viagem.destination}</div>
-                                            <div>Lugares:{viagem.seatingcapacity}</div>
+                                            <div>
+                                                Lugares:{viagem.occupiedseats}/{viagem.seatingcapacity}
+                                            </div>
                                             <Link to="/Editar/Viagem" state={viagem}>
                                                 <button>Editar</button>
                                             </Link>
