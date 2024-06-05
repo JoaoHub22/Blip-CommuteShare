@@ -1,13 +1,18 @@
 /* eslint-disable @typescript-eslint/no-shadow */
+//@ts-nocheck
 import DatePicker from 'react-datepicker';
-import { SetStateAction, useState } from 'react';
+import { SetStateAction, useContext, useEffect, useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import { collection, doc, getDocs, getFirestore, query, updateDoc, where } from 'firebase/firestore';
-import { Link, useLocation, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+
+import { AuthContext } from '../context/auth-context';
 
 import './EditPage.scss';
 
 function EditTripRequest() {
+    const { currentUser } = useContext(AuthContext);
+    const navigate = useNavigate();
     const location = useLocation();
     const { tipo } = useParams();
     const id = location.state.id;
@@ -17,11 +22,18 @@ function EditTripRequest() {
     const [frequency, setFrequency] = useState(location.state.frequency);
     const dropDownButton = document.querySelector('#dropdownHere');
     const buttons = document.querySelectorAll('.dropdown-item');
-    const [date, setDate] = useState(new Date());
+    const [date, setDate] = useState();
+    const startDate = new Date();
     const [startingpoint, setStartingpoint] = useState(location.state.startingpoint);
     const firestore = getFirestore();
     const ListaViagens = collection(firestore, 'Viagens');
     const ListaPedidosBoleia = collection(firestore, 'PedidosBoleia');
+
+    useEffect(() => {
+        if (!currentUser) {
+            navigate('/Login');
+        }
+    }, [currentUser, navigate]);
 
     const EditTrip = async () => {
         if (tipo === 'Viagem') {
@@ -99,7 +111,7 @@ function EditTripRequest() {
             <h3>Data</h3>
             <div>
                 {/*@ts-ignore */}
-                <DatePicker showTimeSelect id="Date" selected={date} onChange={handleChange} />
+                <DatePicker showTimeSelect id="Date" startDate={startDate} minDate={startDate} selected={date} onChange={handleChange} />
             </div>
             {tipo === 'Viagem' && (
                 <>
@@ -177,12 +189,16 @@ function EditTripRequest() {
 
             <h3>Destino</h3>
             <input className="input-group" value={destination} onChange={e => setDestination(e.currentTarget.value)}></input>
-
-            <button id="ButConf" onClick={() => EditTrip()}>
-                Confimar
-            </button>
             <Link to="/Viagens">
-                <button id="ButCanc">Cancelar</button>
+                <button className="button" id="ButConf" onClick={() => EditTrip()}>
+                    Confimar
+                </button>
+            </Link>
+
+            <Link to="/Viagens">
+                <button className="button" id="ButCanc">
+                    Cancelar
+                </button>
             </Link>
         </div>
     );

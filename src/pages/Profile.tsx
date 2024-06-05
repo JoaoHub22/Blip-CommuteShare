@@ -2,6 +2,7 @@
 //@ts-nocheck
 import { useContext, useEffect, useState } from 'react';
 import { collection, query, where, updateDoc, getDocs, getFirestore } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';
 
 import { AuthContext } from '../context/auth-context';
 import ImagemPerfil from '../assets/profile-circle-icon-2048x2048-cqe5466q.png';
@@ -17,6 +18,7 @@ interface Profiles {
 
 function Profile() {
     const { currentUser } = useContext(AuthContext);
+    const navigate = useNavigate();
     const firestore = getFirestore();
     const [isLoading, setIsLoading] = useState(false);
     const [profile, setProfile] = useState<Profiles[]>([]);
@@ -52,6 +54,10 @@ function Profile() {
     };
 
     useEffect(() => {
+        if (!currentUser) {
+            navigate('/Login');
+        }
+
         const handleGetProfile = async () => {
             setIsLoading(true);
             const items = [];
@@ -70,7 +76,7 @@ function Profile() {
         };
 
         handleGetProfile();
-    }, []);
+    }, [currentUser, navigate]);
 
     return (
         <div className="container" id="lista">
@@ -85,13 +91,17 @@ function Profile() {
                                         {Editmode ? (
                                             <li className="list-group-item" key={perfil.id}>
                                                 <h3>Nome de utilizador:</h3>
-                                                <input className="input-group" onChange={e => setUsername(e.currentTarget.value)}>
-                                                    {username}
-                                                </input>
+                                                <input
+                                                    className="input-group"
+                                                    value={username}
+                                                    onChange={e => setUsername(e.currentTarget.value)}
+                                                ></input>
                                                 <h3>Descrição:</h3>
-                                                <input className="input-group" onChange={e => setDescription(e.currentTarget.value)}>
-                                                    {description}
-                                                </input>
+                                                <input
+                                                    className="input-group"
+                                                    value={description}
+                                                    onChange={e => setDescription(e.currentTarget.value)}
+                                                ></input>
                                                 <button onClick={() => SaveProfile()}>Confirmar</button>
                                                 <button onClick={() => setEditmode(false)}>Cancelar</button>
                                             </li>

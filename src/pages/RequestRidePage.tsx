@@ -5,7 +5,7 @@ import { v4 as uuid } from 'uuid';
 import { SetStateAction, useContext, useEffect, useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import { addDoc, arrayUnion, collection, query, getFirestore, where, updateDoc, getDocs, doc, onSnapshot } from 'firebase/firestore';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import { AuthContext } from '../context/auth-context';
 
@@ -21,6 +21,8 @@ interface DetalhesBoleia {
 }
 
 function RequestRide() {
+    const { currentUser } = useContext(AuthContext);
+    const navigate = useNavigate();
     const id = uuid();
     const location = useLocation();
     const TripId = location.state.id;
@@ -35,7 +37,6 @@ function RequestRide() {
     const firestore = getFirestore();
     const ListaPedidosBoleia = collection(firestore, 'PedidosBoleia');
     const ListaViagens = collection(firestore, 'Viagens');
-    const { currentUser } = useContext(AuthContext);
     const [boleianova, setBoleianova] = useState('PedidoNovo');
 
     const SendRequest = async boleiaID => {
@@ -77,6 +78,10 @@ function RequestRide() {
     };
 
     useEffect(() => {
+        if (!currentUser) {
+            navigate('/Login');
+        }
+
         const handleGetPedidosBoleia = async () => {
             setIsLoading(true);
 
@@ -98,7 +103,7 @@ function RequestRide() {
         };
 
         handleGetPedidosBoleia();
-    }, []);
+    }, [currentUser, navigate]);
     const handleChange = (date: SetStateAction<Date>) => {
         setDate(date);
     };

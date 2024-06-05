@@ -3,9 +3,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { Routes, Route } from 'react-router-dom';
 
-// import { AuthContext } from './context/auth-context';
-// import RequireAuth from './components/require-auth.tsx';
-import imagePath from './assets/your_image_icon.png';
+import imagePath from './assets/CommuteShare.png';
 import NavBar from './components/navbar';
 import Home from './pages/Home.tsx';
 import Login from './pages/Login.tsx';
@@ -20,16 +18,6 @@ import OferecerBoleia from './pages/OfferRidePage.tsx';
 
 function App() {
     const items = ['Página Principal', 'Boleias', 'Histórico'];
-    // const { currentUser } = useContext(AuthContext);
-    // const navigate = useNavigate();
-
-    //Check if the current user exists on the initial render.
-    // useEffect(() => {
-    //     if (!currentUser) {
-    //         navigate('/Login');
-    //         navigate('/Register');
-    //     }
-    // }, [currentUser, navigate]);
 
     return (
         <>

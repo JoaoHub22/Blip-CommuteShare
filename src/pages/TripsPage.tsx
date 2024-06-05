@@ -2,7 +2,7 @@
 //@ts-nocheck
 import { useContext, useEffect, useState } from 'react';
 import { collection, query, where, deleteDoc, getDocs, getFirestore, onSnapshot } from 'firebase/firestore';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { AuthContext } from '../context/auth-context';
 
@@ -10,13 +10,13 @@ import './TripsPage.scss';
 
 interface DetalhesViagem {
     id: string;
+    BoleiasPedidos: Array;
     startingpoint: string;
     destination: string;
     date: string;
     frequency: string;
     //@ts-ignore
     user: string;
-    occupiedseats: number;
     seatingcapacity: number;
 }
 
@@ -27,9 +27,11 @@ interface DetalhesBoleia {
     date: string;
     //@ts-ignore
     user: string;
+    ViagemAceite: string;
 }
 function Trips() {
     const { currentUser } = useContext(AuthContext);
+    const navigate = useNavigate();
     const [viagens, setViagens] = useState<DetalhesViagem[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [tipo, setTipo] = useState('Viagens');
@@ -37,8 +39,31 @@ function Trips() {
     const firestore = getFirestore();
     const ListaViagens = collection(firestore, 'Viagens');
     const ListaPedidosBoleia = collection(firestore, 'PedidosBoleia');
-
     const [filter, setFilter] = useState('');
+    const [Mostrarpedidos, setMostrarpedidos] = useState(false);
+    const [pedidos, setPedidos] = useState<DetalhesBoleia[]>([]);
+
+    const PedidosBoleia = async viagem => {
+        const boleiasid: string[] = viagem.BoleiasPedidos;
+        const listapedidos: DetalhesBoleia[] = [];
+
+        let i = 0;
+
+        boleias.forEach(boleia => {
+            while (i < boleiasid.length) {
+                if (boleia.id === boleiasid[i]) {
+                    listapedidos.push(boleiasid[i]);
+                }
+                i = i + 1;
+            }
+            i = 0;
+        });
+
+        setMostrarpedidos(true);
+        console.log(Mostrarpedidos);
+
+        setPedidos(listapedidos);
+    };
 
     const Delete = async id => {
         if (tipo === 'Viagens próprias') {
@@ -108,8 +133,6 @@ function Trips() {
             };
         };
 
-        handleGetViagens();
-
         const handleGetPedidosBoleia = async () => {
             setIsLoading(true);
 
@@ -130,11 +153,16 @@ function Trips() {
             };
         };
 
-        handleGetPedidosBoleia();
-    }, []);
+        if (!currentUser) {
+            navigate('/Login');
+        } else {
+            handleGetViagens();
+            handleGetPedidosBoleia();
+        }
+    }, [currentUser, navigate]);
 
     return (
-        <>
+        <div className="container">
             <h3>Viagens</h3>
             <input
                 type="search"
@@ -162,7 +190,7 @@ function Trips() {
                             {viagens
                                 .filter(viagem => {
                                     if (filter != '') {
-                                        return viagem.destination === filter;
+                                        return viagem.destination.includes(filter);
                                     } else return viagem;
                                 })
                                 .map(viagem => {
@@ -173,11 +201,13 @@ function Trips() {
                                             <div>Ponto de partida:{viagem.startingpoint}</div>
                                             <div>Destino:{viagem.destination}</div>
                                             <div>
-                                                Lugares:{viagem.occupiedseats}/{viagem.seatingcapacity}
+                                                Lugares:{viagem.BoleiasPedidos.length + 1}/{viagem.seatingcapacity}
                                             </div>
-                                            <Link to="/PedirBoleia" state={viagem}>
-                                                <button>Pedir boleia</button>
-                                            </Link>
+                                            {viagem.BoleiasPedidos.length + 1 < viagem.seatingcapacity && viagem.user != currentUser.email && (
+                                                <Link to="/PedirBoleia" state={viagem}>
+                                                    <button className="button">Pedir boleia</button>
+                                                </Link>
+                                            )}
                                         </li>
                                     );
                                 })}
@@ -201,9 +231,11 @@ function Trips() {
                                         <div>Data: {new Date(Number(`${boleia.date.seconds}000`)).toLocaleString('PT-PT')}</div>
                                         <div>Local para apanhar:{boleia.pickuplocation}</div>
                                         <div>Destino:{boleia.destination}</div>
-                                        <Link to="/OferecerBoleia" state={boleia}>
-                                            <button>Oferecer boleia</button>
-                                        </Link>
+                                        {boleia.ViagemAceite === '' && viagem.user != currentUser.email && (
+                                            <Link to="/OferecerBoleia" state={boleia}>
+                                                <button className="button">Oferecer boleia</button>
+                                            </Link>
+                                        )}
                                     </li>
                                 );
                             })}
@@ -233,13 +265,17 @@ function Trips() {
                                             <div>Ponto de partida:{viagem.startingpoint}</div>
                                             <div>Destino:{viagem.destination}</div>
                                             <div>
-                                                Lugares:{viagem.occupiedseats}/{viagem.seatingcapacity}
+                                                Lugares:{viagem.BoleiasPedidos.length + 1}/{viagem.seatingcapacity}
                                             </div>
                                             <Link to="/Editar/Viagem" state={viagem}>
-                                                <button>Editar</button>
+                                                <button className="button">Editar</button>
                                             </Link>
-
-                                            <button onClick={() => Delete(viagem.id)}>Apagar</button>
+                                            <button className="button" onClick={() => Delete(viagem.id)}>
+                                                Apagar
+                                            </button>
+                                            <button className="button" onClick={() => PedidosBoleia(viagem)}>
+                                                Mostrar pedidos aceites
+                                            </button>
                                         </li>
                                     );
                                 })}
@@ -269,9 +305,13 @@ function Trips() {
                                             <div>Local para apanhar:{boleia.pickuplocation}</div>
                                             <div>Destino:{boleia.destination}</div>
                                             <Link to="/Editar/Boleia" state={boleia}>
-                                                <button>Editar</button>
+                                                <button className="button" type="button">
+                                                    Primary action
+                                                </button>
                                             </Link>
-                                            <button onClick={() => Delete(boleia.id)}>Apagar</button>
+                                            <button className="button" onClick={() => Delete(boleia.id)}>
+                                                Apagar
+                                            </button>
                                         </li>
                                     );
                                 })}
@@ -284,7 +324,43 @@ function Trips() {
                     )}
                 </div>
             )}
-        </>
+            {Mostrarpedidos && (
+                <div className="container" id="listaPedidos">
+                    <h3>Pedidos de boleia</h3>
+                    {!isLoading && (
+                        <ul className="list-group">
+                            {boleias
+                                .filter(boleia => {
+                                    let i = 0;
+
+                                    while (i < pedidos.length) {
+                                        if (boleia.id === pedidos[i]) {
+                                            return boleia.id === pedidos[i];
+                                        }
+
+                                        i++;
+                                    }
+                                })
+                                .map(boleia => {
+                                    return (
+                                        <li className="list-group-item" key={boleia.id}>
+                                            <div>Utilizador:{boleia.user}</div>
+                                            <div>Data:{new Date(Number(`${boleia.date.seconds}000`)).toLocaleString('PT-PT')}</div>
+                                            <div>Local para apanhar:{boleia.pickuplocation}</div>
+                                            <div>Destino:{boleia.destination}</div>
+                                        </li>
+                                    );
+                                })}
+                        </ul>
+                    )}
+                    {isLoading && (
+                        <div className="spinner-border" role="status">
+                            <span className="visually-hidden">Loading...</span>
+                        </div>
+                    )}
+                </div>
+            )}
+        </div>
     );
 }
 

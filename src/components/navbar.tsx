@@ -26,7 +26,7 @@ function NavBar({ brandName, imageSrcPath }: NavBarProps) {
     const { currentUser, signOut } = useContext(AuthContext);
     const firestore = getFirestore();
     const [profile, setProfile] = useState<Profiles[]>([]);
-    const ProfileList = collection(firestore, 'Profiles');
+
     let isLoggedIn = false;
 
     if (currentUser != null) {
@@ -35,6 +35,7 @@ function NavBar({ brandName, imageSrcPath }: NavBarProps) {
 
     useEffect(() => {
         const handleGetProfile = async () => {
+            const ProfileList = collection(firestore, 'Profiles');
             const items = [];
             const grupoteste = query(ProfileList, where('email', '==', currentUser.email));
             const querySnapshot = await getDocs(grupoteste);
@@ -49,14 +50,16 @@ function NavBar({ brandName, imageSrcPath }: NavBarProps) {
             };
         };
 
-        handleGetProfile();
-    }, []);
+        if (currentUser?.email) {
+            handleGetProfile();
+        }
+    }, [currentUser?.email, firestore]);
 
     return (
         <nav className="navbar navbar-expand-md navbar-light bg-white shadow">
             <div className="container-fluid">
                 <Link className="navbar-brand" to="Home">
-                    <img src={imageSrcPath} alt="" width="60" height="60" className="d-inline-block align-center" />
+                    <img src={imageSrcPath} alt="" width="100" height="60" className="d-inline-block align-center" />
                     <span className="fw-bolder sf-4">{brandName}</span>
                 </Link>
                 <button
@@ -109,7 +112,7 @@ function NavBar({ brandName, imageSrcPath }: NavBarProps) {
                     </Link>
                     <Link className="nav-link" to="Perfil">
                         {isLoggedIn ? <img src={ImagemPerfil} alt="" width="40" height="40" /> : <></>}
-                        {/*@ts-ignore */}
+
                         {isLoggedIn ? (
                             <>
                                 {profile.map(perfil => {
@@ -120,7 +123,6 @@ function NavBar({ brandName, imageSrcPath }: NavBarProps) {
                             <></>
                         )}
                     </Link>
-                    {/* Não deve ser um botão */}
                     {isLoggedIn ? (
                         <button type="button" className="btn btn-outline-primary me-2" onClick={signOut}>
                             Sign Out

@@ -5,7 +5,7 @@ import { v4 as uuid } from 'uuid';
 import { SetStateAction, useContext, useEffect, useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import { addDoc, arrayUnion, collection, query, getFirestore, where, updateDoc, getDocs, doc, onSnapshot } from 'firebase/firestore';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import { AuthContext } from '../context/auth-context';
 
@@ -24,6 +24,8 @@ interface DetalhesViagem {
 }
 
 function OfferRide() {
+    const { currentUser } = useContext(AuthContext);
+    const navigate = useNavigate();
     const id = uuid();
     const location = useLocation();
     const RequestId = location.state.id;
@@ -37,7 +39,6 @@ function OfferRide() {
     const firestore = getFirestore();
     const ListaPedidosBoleia = collection(firestore, 'PedidosBoleia');
     const ListaViagens = collection(firestore, 'Viagens');
-    const { currentUser } = useContext(AuthContext);
     const [viagemnova, setViagemnova] = useState('ViagemNova');
 
     const AddTrip = async () => {
@@ -78,6 +79,10 @@ function OfferRide() {
     };
 
     useEffect(() => {
+        if (!currentUser) {
+            navigate('/Login');
+        }
+
         const handleGetViagens = async () => {
             setIsLoading(true);
 
@@ -99,7 +104,7 @@ function OfferRide() {
         };
 
         handleGetViagens();
-    }, []);
+    }, [currentUser, navigate]);
     const handleChange = (date: SetStateAction<Date>) => {
         setDate(date);
     };

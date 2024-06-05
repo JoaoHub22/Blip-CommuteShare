@@ -1,16 +1,18 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import DatePicker from 'react-datepicker';
 import { v4 as uuid } from 'uuid';
-import { SetStateAction, useContext, useState } from 'react';
+import { SetStateAction, useContext, useEffect, useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import { addDoc, collection, getFirestore } from 'firebase/firestore';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { AuthContext } from '../context/auth-context';
 
 import './AddPage.scss';
 
 function AddTripRequest() {
+    const { currentUser } = useContext(AuthContext);
+    const navigate = useNavigate();
     const id = uuid();
     const [destination, setDestination] = useState('');
     const [pickuplocation, setPickuplocation] = useState('');
@@ -19,17 +21,25 @@ function AddTripRequest() {
     const dropDownButton = document.querySelector('#dropdownHere');
     const buttons = document.querySelectorAll('.dropdown-item');
     const [date, setDate] = useState(new Date());
+    const startDate = new Date();
     const [tipo, setTipo] = useState('Viagem');
     const [startingpoint, setStartingpoint] = useState('');
     const firestore = getFirestore();
     const ListaViagens = collection(firestore, 'Viagens');
     const ListaPedidosBoleia = collection(firestore, 'PedidosBoleia');
-    const { currentUser } = useContext(AuthContext);
+
+    useEffect(() => {
+        if (!currentUser) {
+            navigate('/Login');
+        }
+    }, [currentUser, navigate]);
+
     const AddTrip = async () => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         if (tipo == 'Viagem') {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             addDoc(ListaViagens, {
+                BoleiasPedidos: [],
                 id: id,
                 startingpoint: startingpoint,
                 destination: destination,
@@ -43,6 +53,7 @@ function AddTripRequest() {
         if (tipo == 'Boleia') {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             addDoc(ListaPedidosBoleia, {
+                ViagemAceite: '',
                 id: id,
                 pickuplocation: pickuplocation,
                 destination: destination,
@@ -78,7 +89,7 @@ function AddTripRequest() {
             <h3>Data</h3>
             <div>
                 {/*@ts-ignore */}
-                <DatePicker showTimeSelect id="Date" selected={date} onChange={handleChange} />
+                <DatePicker showTimeSelect id="Date" startDate={startDate} minDate={startDate} selected={date} onChange={handleChange} />
             </div>
             {tipo === 'Viagem' && (
                 <>
@@ -155,13 +166,15 @@ function AddTripRequest() {
             <input className="input-group" onChange={e => setDestination(e.currentTarget.value)}></input>
 
             <Link to="/Viagens">
-                <button id="ButConf" onClick={() => AddTrip()}>
+                <button className="button" id="ButConf" onClick={() => AddTrip()}>
                     Confimar
                 </button>
             </Link>
 
             <Link to="/Viagens">
-                <button id="ButCanc">Cancelar</button>
+                <button className="button" id="ButCanc">
+                    Cancelar
+                </button>
             </Link>
         </div>
     );
