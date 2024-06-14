@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-shadow */
+//@ts-nocheck
 import DatePicker from 'react-datepicker';
 import { v4 as uuid } from 'uuid';
 import { SetStateAction, useContext, useEffect, useState } from 'react';
@@ -39,6 +40,7 @@ function AddTripRequest() {
         if (tipo == 'Viagem') {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             addDoc(ListaViagens, {
+                PedidosRecebidos: [],
                 BoleiasPedidos: [],
                 id: id,
                 startingpoint: startingpoint,
@@ -53,6 +55,7 @@ function AddTripRequest() {
         if (tipo == 'Boleia') {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             addDoc(ListaPedidosBoleia, {
+                ViagensOferecidas: [],
                 ViagemAceite: '',
                 id: id,
                 pickuplocation: pickuplocation,
@@ -89,7 +92,15 @@ function AddTripRequest() {
             <h3>Data</h3>
             <div>
                 {/*@ts-ignore */}
-                <DatePicker showTimeSelect id="Date" startDate={startDate} minDate={startDate} selected={date} onChange={handleChange} />
+                <DatePicker
+                    showTimeSelect
+                    id="Date"
+                    startDate={startDate}
+                    minDate={startDate}
+                    selected={date}
+                    onChange={handleChange}
+                    dateFormat={'d MMMM yyyy, h:mmaa'}
+                />
             </div>
             {tipo === 'Viagem' && (
                 <>

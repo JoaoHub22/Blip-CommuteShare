@@ -1,23 +1,27 @@
 #listaPedidosBoleia{
-    top: 450px;
-    position:absolute;
+    top: 50%;
+    position:relative;
     left: 200px;
 }
 
 #listaViagens{
-    top: 150px;
-    position:absolute;
+    position:relative;
     left: 200px;
 }
 
 #listaViagensProprias{
-    top: 150px;
-    position:absolute;
+    position:relative;
     left: 800px;
 }
 
 #listaPedidosProprios{
-    top: 450px;
-    position:absolute;
+    top: 50%;
+    position:relative;
     left: 800px;
+}
+
+#username{
+    position:absolute;
+    top:135px;
+    left:55px;
 }

@@ -2,7 +2,7 @@
 
 import { useContext, useEffect, useState } from 'react';
 import { collection, getFirestore, onSnapshot } from 'firebase/firestore';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { AuthContext } from '../context/auth-context';
 
@@ -39,8 +39,52 @@ function HistoricoViagens() {
     const ListaViagens = collection(firestore, 'Viagens');
     const ListaPedidosBoleia = collection(firestore, 'PedidosBoleia');
     // const [filter, setFilter] = useState('');
-    // const [Mostrarpedidos, setMostrarpedidos] = useState(false);
-    // const [pedidos, setPedidos] = useState<DetalhesBoleia[]>([]);
+    const [Mostrarpedidos, setMostrarpedidos] = useState(false);
+    const [pedidos, setPedidos] = useState<DetalhesBoleia[]>([]);
+    const [viagemAceitadaid, setViagemAceitadaid] = useState();
+
+    const ChangeType = async typechosen => {
+        setTipo(typechosen);
+        setViagemAceitadaid();
+        setMostrarpedidos(false);
+    };
+
+    const ViagemAceite = async boleiaid => {
+        let i = 0;
+        let foundtrip = false;
+
+        viagens.forEach(viagem => {
+            while (i < viagem.BoleiasPedidos.length && foundtrip === false) {
+                if (boleiaid === viagem.BoleiasPedidos[i]) {
+                    setViagemAceitadaid(viagem.id);
+                    foundtrip = true;
+                }
+                i++;
+            }
+            i = 0;
+        });
+    };
+
+    const PedidosBoleia = async viagem => {
+        const boleiasid: string[] = viagem.BoleiasPedidos;
+        const listapedidos: DetalhesBoleia[] = [];
+
+        let i = 0;
+
+        boleias.forEach(boleia => {
+            while (i < boleiasid.length) {
+                if (boleia.id === boleiasid[i]) {
+                    listapedidos.push(boleiasid[i]);
+                }
+                i = i + 1;
+            }
+            i = 0;
+        });
+
+        setMostrarpedidos(true);
+
+        setPedidos(listapedidos);
+    };
 
     useEffect(() => {
         if (!currentUser) {
@@ -60,6 +104,7 @@ function HistoricoViagens() {
                 });
                 //@ts-ignore
                 setViagens(items);
+
                 setIsLoading(false);
             });
 
@@ -100,7 +145,7 @@ function HistoricoViagens() {
                 id="SelectList"
                 className="form-select form-select-sm"
                 aria-label="Small select example"
-                onChange={e => setTipo(e.currentTarget.value)}
+                onChange={e => ChangeType(e.currentTarget.value)}
             >
                 <option value="Viagens">Viagens</option>
                 <option value="PedidosBoleia">Pedidos de boleia</option>
@@ -111,9 +156,7 @@ function HistoricoViagens() {
                         <ul className="list-group">
                             {viagens
                                 .filter(viagem => {
-                                    if (filter != '') {
-                                        return viagem.destination.includes(filter);
-                                    } else return viagem;
+                                    return viagem.user === currentUser.email && Number(`${viagem.date.seconds}000`) < Number(new Date());
                                 })
                                 .map(viagem => {
                                     return (
@@ -121,12 +164,14 @@ function HistoricoViagens() {
                                             <div>Utilizador:{viagem.user}</div>
 
                                             <div>Data: {new Date(Number(`${viagem.date.seconds}000`)).toLocaleString('PT-PT')}</div>
-
                                             <div>Ponto de partida:{viagem.startingpoint}</div>
                                             <div>Destino:{viagem.destination}</div>
                                             <div>
                                                 Lugares:{viagem.BoleiasPedidos.length + 1}/{viagem.seatingcapacity}
                                             </div>
+                                            <button className="button" onClick={() => PedidosBoleia(viagem)}>
+                                                Mostrar pedidos aceites
+                                            </button>
                                         </li>
                                     );
                                 })}
@@ -143,21 +188,90 @@ function HistoricoViagens() {
                 <div className="container" id="lista">
                     {!isLoading && (
                         <ul className="list-group">
-                            {boleias.map(boleia => {
-                                return (
-                                    <li className="list-group-item" key={boleia.id}>
-                                        <div>Utilizador:{boleia.user}</div>
-                                        <div>Data: {new Date(Number(`${boleia.date.seconds}000`)).toLocaleString('PT-PT')}</div>
-                                        <div>Local para apanhar:{boleia.pickuplocation}</div>
-                                        <div>Destino:{boleia.destination}</div>
-                                        {boleia.ViagemAceite === '' && (
-                                            <Link to="/OferecerBoleia" state={boleia}>
-                                                <button>Oferecer boleia</button>
-                                            </Link>
-                                        )}
-                                    </li>
-                                );
-                            })}
+                            {boleias
+                                .filter(boleia => {
+                                    return boleia.user === currentUser.email && Number(`${boleia.date.seconds}000`) < Number(new Date());
+                                })
+                                .map(boleia => {
+                                    return (
+                                        <li className="list-group-item" key={boleia.id}>
+                                            <div>Utilizador:{boleia.user}</div>
+                                            <div>Data: {new Date(Number(`${boleia.date.seconds}000`)).toLocaleString('PT-PT')}</div>
+                                            <div>Local para apanhar:{boleia.pickuplocation}</div>
+                                            <div>Destino:{boleia.destination}</div>
+                                            <button className="button" onClick={() => ViagemAceite(boleia.id)}>
+                                                Mostrar viagem aceite
+                                            </button>
+                                        </li>
+                                    );
+                                })}
+                        </ul>
+                    )}
+                    {isLoading && (
+                        <div className="spinner-border" role="status">
+                            <span className="visually-hidden">Loading...</span>
+                        </div>
+                    )}
+                </div>
+            )}
+            {Mostrarpedidos && (
+                <div className="container" id="listaPedidos">
+                    <h3>Pedidos de boleia</h3>
+                    {!isLoading && (
+                        <ul className="list-group">
+                            {boleias
+                                .filter(boleia => {
+                                    let i = 0;
+
+                                    while (i < pedidos.length) {
+                                        if (boleia.id === pedidos[i]) {
+                                            return boleia.id === pedidos[i];
+                                        }
+
+                                        i++;
+                                    }
+                                })
+                                .map(boleia => {
+                                    return (
+                                        <li className="list-group-item" key={boleia.id}>
+                                            <div>Utilizador:{boleia.user}</div>
+                                            <div>Data:{new Date(Number(`${boleia.date.seconds}000`)).toLocaleString('PT-PT')}</div>
+                                            <div>Local para apanhar:{boleia.pickuplocation}</div>
+                                            <div>Destino:{boleia.destination}</div>
+                                        </li>
+                                    );
+                                })}
+                        </ul>
+                    )}
+                    {isLoading && (
+                        <div className="spinner-border" role="status">
+                            <span className="visually-hidden">Loading...</span>
+                        </div>
+                    )}
+                </div>
+            )}
+            {viagemAceitadaid != null && (
+                <div className="container" id="listaPedidos">
+                    <h3>Viagem aceite</h3>
+                    {!isLoading && (
+                        <ul className="list-group">
+                            {viagens
+                                .filter(viagem => {
+                                    return viagem.id === viagemAceitadaid;
+                                })
+                                .map(viagem => {
+                                    return (
+                                        <li className="list-group-item" key={viagem.id}>
+                                            <div>Utilizador:{viagem.user}</div>
+                                            <div>Data: {new Date(Number(`${viagem.date.seconds}000`)).toLocaleString('PT-PT')}</div>
+                                            <div>Ponto de partida:{viagem.startingpoint}</div>
+                                            <div>Destino:{viagem.destination}</div>
+                                            <div>
+                                                Lugares:{viagem.BoleiasPedidos.length + 1}/{viagem.seatingcapacity}
+                                            </div>
+                                        </li>
+                                    );
+                                })}
                         </ul>
                     )}
                     {isLoading && (

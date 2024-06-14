@@ -54,7 +54,7 @@ function RequestRide() {
                 const docRef = doc(ListaViagens, docID);
 
                 await updateDoc(docRef, {
-                    BoleiasPedidos: arrayUnion(boleiaID)
+                    PedidosRecebidos: arrayUnion(boleiaID)
                 });
             }
         } catch (ex) {

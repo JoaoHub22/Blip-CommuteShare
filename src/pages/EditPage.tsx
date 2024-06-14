@@ -22,7 +22,7 @@ function EditTripRequest() {
     const [frequency, setFrequency] = useState(location.state.frequency);
     const dropDownButton = document.querySelector('#dropdownHere');
     const buttons = document.querySelectorAll('.dropdown-item');
-    const [date, setDate] = useState();
+    const [date, setDate] = useState(new Date(Number(`${location.state.date.seconds}000`)));
     const startDate = new Date();
     const [startingpoint, setStartingpoint] = useState(location.state.startingpoint);
     const firestore = getFirestore();
@@ -111,7 +111,15 @@ function EditTripRequest() {
             <h3>Data</h3>
             <div>
                 {/*@ts-ignore */}
-                <DatePicker showTimeSelect id="Date" startDate={startDate} minDate={startDate} selected={date} onChange={handleChange} />
+                <DatePicker
+                    showTimeSelect
+                    id="Date"
+                    startDate={startDate}
+                    minDate={startDate}
+                    selected={date}
+                    onChange={handleChange}
+                    dateFormat={'d MMMM yyyy, h:mmaa'}
+                />
             </div>
             {tipo === 'Viagem' && (
                 <>
