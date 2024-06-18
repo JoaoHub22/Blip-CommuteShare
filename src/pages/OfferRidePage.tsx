@@ -52,6 +52,11 @@ function OfferRide() {
             //@ts-ignore
             user: currentUser.email
         });
+        toast.show({
+            title: 'Viagem criada',
+            content: 'Viagem guardado com sucesso',
+            duration: 10000
+        });
     };
 
     const SendOffer = async viagemID => {
@@ -72,6 +77,11 @@ function OfferRide() {
                     BoleiasPedidos: arrayUnion(RequestId)
                 });
             }
+            toast.show({
+                title: 'Oferta enviada',
+                content: 'Oferta guardada com sucesso',
+                duration: 10000
+            });
         } catch (ex) {
             // eslint-disable-next-line no-console
             console.log(ex);

@@ -58,6 +58,11 @@ function EditTripRequest() {
                         seatingcapacity: seatingcapacity
                     });
                 }
+                toast.show({
+                    title: 'Viagem editado',
+                    content: 'Viagem guardado com sucesso',
+                    duration: 10000
+                });
             } catch (ex) {
                 // eslint-disable-next-line no-console
                 console.log(ex);
@@ -84,6 +89,11 @@ function EditTripRequest() {
                         frequency: frequency
                     });
                 }
+                toast.show({
+                    title: 'Pedido de boleia editado',
+                    content: 'Pedido de boleia guardado com sucesso',
+                    duration: 10000
+                });
             } catch (ex) {
                 // eslint-disable-next-line no-console
                 console.log(ex);

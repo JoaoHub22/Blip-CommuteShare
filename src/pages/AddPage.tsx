@@ -7,6 +7,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { addDoc, collection, getFirestore } from 'firebase/firestore';
 import { Link, useNavigate } from 'react-router-dom';
 
+import { toast } from '../components/toastmanager';
 import { AuthContext } from '../context/auth-context';
 
 import './AddPage.scss';
@@ -19,6 +20,7 @@ function AddTripRequest() {
     const [pickuplocation, setPickuplocation] = useState('');
     const [seatingcapacity, setSeatingcapacity] = useState('');
     const [frequency, setFrequency] = useState('');
+    // const [weeklyfrequency, setWeeklyFrequency] = useState('Única vez');
     const dropDownButton = document.querySelector('#dropdownHere');
     const buttons = document.querySelectorAll('.dropdown-item');
     const [date, setDate] = useState(new Date());
@@ -38,33 +40,59 @@ function AddTripRequest() {
     const AddTrip = async () => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         if (tipo == 'Viagem') {
+            if (startingpoint != '' && seatingcapacity != '' && destination != '') {
+                addDoc(ListaViagens, {
+                    PedidosRecebidos: [],
+                    BoleiasPedidos: [],
+                    id: id,
+                    startingpoint: startingpoint,
+                    destination: destination,
+                    date: date,
+                    frequency: frequency,
+                    //@ts-ignore
+                    user: currentUser.email,
+                    seatingcapacity: seatingcapacity
+                });
+                toast.show({
+                    title: 'Viagem adicionado',
+                    content: 'Viagem guardado com sucesso',
+                    duration: 10000
+                });
+            } else {
+                toast.show({
+                    title: 'Erro',
+                    content: 'Há elementos por preencher',
+                    duration: 10000
+                });
+            }
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            addDoc(ListaViagens, {
-                PedidosRecebidos: [],
-                BoleiasPedidos: [],
-                id: id,
-                startingpoint: startingpoint,
-                destination: destination,
-                date: date,
-                frequency: frequency,
-                //@ts-ignore
-                user: currentUser.email,
-                seatingcapacity: seatingcapacity
-            });
         }
         if (tipo == 'Boleia') {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            addDoc(ListaPedidosBoleia, {
-                ViagensOferecidas: [],
-                ViagemAceite: '',
-                id: id,
-                pickuplocation: pickuplocation,
-                destination: destination,
-                date: date,
-                frequency: frequency,
-                //@ts-ignore
-                user: currentUser.email
-            });
+            if (pickuplocation != '' && destination != '') {
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                addDoc(ListaPedidosBoleia, {
+                    ViagensOferecidas: [],
+                    ViagemAceite: '',
+                    id: id,
+                    pickuplocation: pickuplocation,
+                    destination: destination,
+                    date: date,
+                    frequency: frequency,
+                    //@ts-ignore
+                    user: currentUser.email
+                });
+                toast.show({
+                    title: 'Pedido de boleia adicionado',
+                    content: 'Pedido de boleia guardado com sucesso',
+                    duration: 10000
+                });
+            } else {
+                toast.show({
+                    title: 'Erro',
+                    content: 'Há elementos por preencher',
+                    duration: 10000
+                });
+            }
         }
     };
 
@@ -117,6 +145,7 @@ function AddTripRequest() {
                     id="flexRadioDefault1"
                     value="Única vez"
                     onChange={e => setFrequency(e.currentTarget.value)}
+                    checked
                 />
                 <label className="form-check-label" htmlFor="flexRadioDefault1">
                     Única vez

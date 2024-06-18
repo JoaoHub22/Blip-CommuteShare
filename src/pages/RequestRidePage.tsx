@@ -57,6 +57,11 @@ function RequestRide() {
                     PedidosRecebidos: arrayUnion(boleiaID)
                 });
             }
+            toast.show({
+                title: 'Pedido enviado',
+                content: 'Pedido enviado com sucesso',
+                duration: 10000
+            });
         } catch (ex) {
             // eslint-disable-next-line no-console
             console.log(ex);
@@ -75,6 +80,11 @@ function RequestRide() {
             user: currentUser.email
         });
         SendRequest(id);
+        toast.show({
+            title: 'Pedido de boleia criado',
+            content: 'Pedido de boleia guardado com sucesso',
+            duration: 10000
+        });
     };
 
     useEffect(() => {

@@ -1,5 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from 'firebase/app';
+import { getMessaging } from 'firebase/messaging';
 import {
     getAuth,
     onAuthStateChanged,
@@ -47,3 +48,5 @@ export const userStateListener = (callback: NextOrObserver<User>) => {
 };
 
 export const SignOutUser = async () => signOut(auth);
+
+export const messaging = getMessaging(app);
