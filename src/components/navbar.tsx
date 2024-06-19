@@ -110,7 +110,7 @@ function NavBar({ brandName, imageSrcPath }: NavBarProps) {
                             </button>
                         )}
                     </Link>
-                    <Link className="nav-link" to="Perfil">
+                    <Link className="nav-link" to="Perfil" state={currentUser.email}>
                         {isLoggedIn ? <img src={ImagemPerfil} alt="" width="40" height="40" /> : <></>}
 
                         {isLoggedIn ? (

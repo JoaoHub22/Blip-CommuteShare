@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 //@ts-nocheck
 import { useContext, useEffect, useState } from 'react';
-import { collection, query, where, updateDoc, getDocs, getFirestore } from 'firebase/firestore';
-import { useNavigate } from 'react-router-dom';
+import { collection, query, where, updateDoc, getDocs, getFirestore, doc } from 'firebase/firestore';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 import { AuthContext } from '../context/auth-context';
 import ImagemPerfil from '../assets/profile-circle-icon-2048x2048-cqe5466q.png';
@@ -19,6 +20,8 @@ interface Profiles {
 function Profile() {
     const { currentUser } = useContext(AuthContext);
     const navigate = useNavigate();
+    const location = useLocation();
+    const email = location.state;
     const firestore = getFirestore();
     const [isLoading, setIsLoading] = useState(false);
     const [profile, setProfile] = useState<Profiles[]>([]);
@@ -27,9 +30,15 @@ function Profile() {
     const [username, setUsername] = useState();
     const [Editmode, setEditmode] = useState(false);
 
+    const ChangetoEdit = async perfil => {
+        setUsername(perfil.username);
+        setDescription(perfil.description);
+        setEditmode(true);
+    };
+
     const SaveProfile = async () => {
         try {
-            const grupoteste = query(ProfileList, where('email', '==', currentUser.email));
+            const grupoteste = query(ProfileList, where('email', '==', email));
             const querySnapshot = await getDocs(grupoteste);
 
             let docID = null;
@@ -61,7 +70,7 @@ function Profile() {
         const handleGetProfile = async () => {
             setIsLoading(true);
             const items = [];
-            const grupoteste = query(ProfileList, where('email', '==', currentUser.email));
+            const grupoteste = query(ProfileList);
             const querySnapshot = await getDocs(grupoteste);
 
             querySnapshot.forEach(doc => {
@@ -85,37 +94,42 @@ function Profile() {
                     <img src={ImagemPerfil} alt="" width="100" height="100" />
                     <div className="container">
                         <ul className="list-group">
-                            {profile.map(perfil => {
-                                return (
-                                    <>
-                                        {Editmode ? (
-                                            <li className="list-group-item" key={perfil.id}>
-                                                <h3>Nome de utilizador:</h3>
-                                                <input
-                                                    className="input-group"
-                                                    value={username}
-                                                    onChange={e => setUsername(e.currentTarget.value)}
-                                                ></input>
-                                                <h3>Descrição:</h3>
-                                                <input
-                                                    className="input-group"
-                                                    value={description}
-                                                    onChange={e => setDescription(e.currentTarget.value)}
-                                                ></input>
-                                                <button onClick={() => SaveProfile()}>Confirmar</button>
-                                                <button onClick={() => setEditmode(false)}>Cancelar</button>
-                                            </li>
-                                        ) : (
-                                            <li className="list-group-item" key={perfil.id}>
-                                                <h2>{perfil.username}</h2>
-                                                <h3>Descrição:</h3>
-                                                <div>{perfil.description}</div>
-                                                <button onClick={() => setEditmode(true)}>Editar</button>
-                                            </li>
-                                        )}
-                                    </>
-                                );
-                            })}
+                            {profile
+                                .filter(perfil => {
+                                    //@ts-ignore
+                                    return perfil.email === email;
+                                })
+                                .map(perfil => {
+                                    return (
+                                        <>
+                                            {Editmode ? (
+                                                <li className="list-group-item" key={perfil.id}>
+                                                    <h3>Nome de utilizador:</h3>
+                                                    <input
+                                                        className="input-group"
+                                                        value={username}
+                                                        onChange={e => setUsername(e.currentTarget.value)}
+                                                    ></input>
+                                                    <h3>Descrição:</h3>
+                                                    <input
+                                                        className="input-group"
+                                                        value={description}
+                                                        onChange={e => setDescription(e.currentTarget.value)}
+                                                    ></input>
+                                                    <button onClick={() => SaveProfile()}>Confirmar</button>
+                                                    <button onClick={() => setEditmode(false)}>Cancelar</button>
+                                                </li>
+                                            ) : (
+                                                <li className="list-group-item" key={perfil.id}>
+                                                    <h2>{perfil.username}</h2>
+                                                    <h3>Descrição:</h3>
+                                                    <div>{perfil.description}</div>
+                                                    <button onClick={() => ChangetoEdit(perfil)}>Editar</button>
+                                                </li>
+                                            )}
+                                        </>
+                                    );
+                                })}
                         </ul>
                     </div>
                 </>

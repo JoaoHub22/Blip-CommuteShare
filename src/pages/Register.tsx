@@ -3,8 +3,9 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useState, ChangeEvent, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { addDoc, collection, getFirestore } from 'firebase/firestore';
+import { getToken } from 'firebase/messaging';
 
-import { CreateAccount } from '../firebase.ts';
+import { messaging, CreateAccount } from '../firebase.ts';
 import '.././App.css';
 
 import './Register.scss';
@@ -38,7 +39,11 @@ function Register() {
                 navigate('/profile');
             }
 
-            addDoc(ListaPerfis, { description: '', email: email, username: username });
+            const token = await getToken(messaging, {
+                vapidKey: 'BHiA2ELNXhDDBRFQpAPb9A37kdtlFsP9YL1sCSGirTmY3Xi0YxfWiOxqV36upgvroFLXjR6bNZy26cbqEzdFcKk'
+            });
+
+            addDoc(ListaPerfis, { description: '', email: email, username: username, token: token });
 
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {

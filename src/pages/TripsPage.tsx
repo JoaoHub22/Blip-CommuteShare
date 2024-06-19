@@ -1,11 +1,14 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable no-console */
 //@ts-nocheck
+import React from 'react';
 import { useContext, useEffect, useState } from 'react';
-import { collection, query, where, deleteDoc, getDocs, getFirestore, onSnapshot, arrayRemove } from 'firebase/firestore';
+import { collection, query, where, deleteDoc, getDocs, getFirestore, onSnapshot, arrayRemove, doc } from 'firebase/firestore';
 import { Link, useNavigate } from 'react-router-dom';
 import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
 
+import { toast } from '../components/toastmanager';
 import { AuthContext } from '../context/auth-context';
 
 import './TripsPage.scss';
@@ -55,11 +58,12 @@ function Trips() {
     const [Destinationfilter, setDestinationFilter] = useState('');
     const [Userfilter, setUserFilter] = useState('');
     const [StartingPointfilter, setStartingPointFilter] = useState('');
+    const [PickupLocationfilter, setPickupLocationFilter] = useState('');
     const [Mostrarpedidos, setMostrarpedidos] = useState(false);
     const [pedidosAceites, setPedidosAceites] = useState<DetalhesBoleia[]>([]);
     const [pedidosPorResponder, setPedidosPorResponder] = useState<DetalhesBoleia[]>([]);
     const [MostrarOfertas, setMostrarOfertas] = useState(false);
-    const [ViagensOferecidas, setViagensOferecidas] = useState<DetalhesBoleia[]>([]);
+    const [ViagensOferecidas, setViagensOferecidas] = useState<DetalhesViagem[]>([]);
     const [viagemAceitadaid, setViagemAceitadaid] = useState();
     const [Profiles, setProfiles] = useState<Profiles[]>([]);
 
@@ -129,11 +133,6 @@ function Trips() {
             // eslint-disable-next-line no-console
             console.log(ex);
         }
-        toast.show({
-            title: 'Pedido aceite',
-            content: 'Passageiro que fez pedido faz parte da tua viagem',
-            duration: 10000
-        });
     };
 
     const RejeitarPedido = async boleiaid => {
@@ -497,11 +496,6 @@ function Trips() {
                 // eslint-disable-next-line no-console
                 console.log(ex);
             }
-            toast.show({
-                title: 'Viagem apagada',
-                content: 'Viagem foi apagada',
-                duration: 10000
-            });
         }
         if (tipo === 'PedidosBoleia próprios') {
             try {
@@ -592,12 +586,17 @@ function Trips() {
             };
         };
 
+        // const loadMap = async () => {
+        //     const resp = await fetch(`https://graphhopper.com/api/1/vrp?key=[980d2455-51e2-450e-be0c-958a2b6c7dbc]`, { method: 'POST' });
+        // };
+
         if (!currentUser) {
             navigate('/Login');
         } else {
             handleGetViagens();
             handleGetPedidosBoleia();
             handleGetProfile();
+            loadMap();
         }
     }, [currentUser, navigate]);
 
@@ -626,6 +625,14 @@ function Trips() {
                     type="search"
                     className="form-control"
                     onChange={e => setDestinationFilter(e.currentTarget.value)}
+                    placeholder="Search..."
+                    aria-label="Search"
+                ></input>
+                <div>Local de boleia</div>
+                <input
+                    type="search"
+                    className="form-control"
+                    onChange={e => setPickupLocationFilter(e.currentTarget.value)}
                     placeholder="Search..."
                     aria-label="Search"
                 ></input>
@@ -705,6 +712,11 @@ function Trips() {
                                         return boleia.destination.includes(Destinationfilter);
                                     } else return boleia;
                                 })
+                                .filter(boleia => {
+                                    if (PickupLocationfilter != '') {
+                                        return boleia.pickuplocation.includes(PickupLocationfilter);
+                                    } else return boleia;
+                                })
                                 .map(boleia => {
                                     return (
                                         <li className="list-group-item" key={boleia.id}>
@@ -743,7 +755,11 @@ function Trips() {
                                         return viagem.destination.includes(Destinationfilter);
                                     } else return viagem;
                                 })
-
+                                .filter(viagem => {
+                                    if (StartingPointfilter != '') {
+                                        return viagem.startingpoint.includes(StartingPointfilter);
+                                    } else return viagem;
+                                })
                                 .map(viagem => {
                                     return (
                                         <li className="list-group-item" key={viagem.id}>
@@ -787,6 +803,11 @@ function Trips() {
                                 .filter(boleia => {
                                     if (Destinationfilter != '') {
                                         return boleia.destination.includes(Destinationfilter);
+                                    } else return boleia;
+                                })
+                                .filter(boleia => {
+                                    if (PickupLocationfilter != '') {
+                                        return boleia.pickuplocation.includes(PickupLocationfilter);
                                     } else return boleia;
                                 })
                                 .map(boleia => {
@@ -980,6 +1001,7 @@ function Trips() {
                     </div>
                 </>
             )}
+            <container id="Map"></container>
         </div>
     );
 }
