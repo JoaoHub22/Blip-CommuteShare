@@ -64,8 +64,11 @@ function RequestRide() {
                 duration: 10000
             });
         } catch (ex) {
-            // eslint-disable-next-line no-console
-            console.log(ex);
+            toast.show({
+                title: 'Erro',
+                content: 'Falha ao enviar pedido de boleia',
+                duration: 10000
+            });
         }
     };
 

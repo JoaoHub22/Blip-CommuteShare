@@ -3,7 +3,9 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useState, ChangeEvent, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { addDoc, collection, getFirestore } from 'firebase/firestore';
+import { getAuth, sendEmailVerification } from 'firebase/auth';
 
+import { toast } from '../components/toastmanager.tsx';
 import { CreateAccount } from '../firebase.ts';
 import '.././App.css';
 
@@ -39,7 +41,16 @@ function Register() {
                 resetFormFields();
                 navigate('/Home');
             }
+            const auth = getAuth();
 
+            //@ts-ignore
+            sendEmailVerification(auth.currentUser).then(() => {
+                toast.show({
+                    title: 'Conta criada',
+                    content: 'Foi enviada uma mensagem ao seu email para verificar a conta',
+                    duration: 10000
+                });
+            });
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             // eslint-disable-next-line no-console

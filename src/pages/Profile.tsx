@@ -34,38 +34,6 @@ function Profile() {
     const [username, setUsername] = useState();
     const [Editmode, setEditmode] = useState(false);
 
-    const ChangetoEdit = async perfil => {
-        setUsername(perfil.username);
-        setDescription(perfil.description);
-        setEditmode(true);
-    };
-
-    const SaveProfile = async () => {
-        try {
-            const grupoteste = query(ProfileList, where('email', '==', email));
-            const querySnapshot = await getDocs(grupoteste);
-
-            let docID = null;
-
-            querySnapshot.forEach(doc => {
-                docID = doc.id;
-            });
-
-            if (docID) {
-                const docRef = doc(ProfileList, docID);
-
-                await updateDoc(docRef, {
-                    description: description,
-                    username: username
-                });
-            }
-            setEditmode(false);
-        } catch (ex) {
-            // eslint-disable-next-line no-console
-            console.log(ex);
-        }
-    };
-
     useEffect(() => {
         if (!currentUser) {
             navigate('/Login');

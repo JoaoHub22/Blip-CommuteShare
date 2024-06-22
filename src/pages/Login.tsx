@@ -1,9 +1,11 @@
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import { useState, ChangeEvent, FormEvent } from 'react';
+import { useState, ChangeEvent, FormEvent, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { signInUser } from '../firebase.ts';
+import { toast } from '../components/toastmanager';
+import { AuthContext } from '../context/auth-context.tsx';
 
 import './Login.scss';
 
@@ -15,6 +17,7 @@ const defaultFormFields = {
 function Login() {
     const [formFields, setFormFields] = useState(defaultFormFields);
     const { email, password } = formFields;
+    const { signOut } = useContext(AuthContext);
     const navigate = useNavigate();
 
     const resetFormFields = () => {
@@ -28,14 +31,24 @@ function Login() {
             // Send the email and password to firebase
             const userCredential = await signInUser(email, password);
 
-            if (userCredential) {
+            if (userCredential?.user.emailVerified) {
                 resetFormFields();
-                navigate('/profile');
+                navigate('/Home');
+            } else {
+                signOut();
+                toast.show({
+                    title: 'Login rejeitado',
+                    content: 'Ainda não fez a verificação por email',
+                    duration: 10000
+                });
             }
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
-            // eslint-disable-next-line no-console
-            console.log('User Sign In Failed', error.message);
+            toast.show({
+                title: 'Login falhou',
+                content: 'Dados mal introduzidos',
+                duration: 10000
+            });
         }
     };
 

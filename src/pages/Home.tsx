@@ -105,7 +105,7 @@ function Home() {
             <img src={ImagemPerfil} alt="" width="50" height="50" />
             {profile.map(perfil => {
                 return (
-                    <h3 id="username" key={perfil.id}>
+                    <h3 id="username" key={perfil.email}>
                         {perfil.username}
                     </h3>
                 );
@@ -118,11 +118,22 @@ function Home() {
                             {viagens.map(viagem => {
                                 return (
                                     <li className="list-group-item" key={viagem.id}>
-                                        <div>Utilizador:{viagem.user}</div>
-                                        <div>Data: {new Date(Number(`${viagem.date.seconds}000`)).toLocaleString('PT-PT')}</div>
-                                        <div>Ponto de partida:{viagem.startingpoint}</div>
-                                        <div>Destino:{viagem.destination}</div>
-                                        <div>
+                                        {profile
+                                            .filter(perfil => {
+                                                return perfil.email === viagem.user;
+                                            })
+                                            .map(perfil => {
+                                                return (
+                                                    <div id="ItemUser" key={perfil.email}>
+                                                        Utilizador:{perfil.username}
+                                                    </div>
+                                                );
+                                            })}
+                                        <div id="ItemDate">Data: {new Date(Number(`${viagem.date.seconds}000`)).toLocaleString('PT-PT')}</div>
+                                        <div id="ItemStartingPoint">
+                                            Percurso:{viagem.startingpoint} - {viagem.destination}
+                                        </div>
+                                        <div id="ItemSeatingCapacity">
                                             Lugares:{viagem.BoleiasPedidos.length + 1}/{viagem.seatingcapacity}
                                         </div>
                                     </li>
@@ -145,8 +156,18 @@ function Home() {
                             {boleias.map(boleia => {
                                 return (
                                     <li className="list-group-item" key={boleia.id}>
-                                        <div>Utilizador:{boleia.user}</div>
-                                        <div>Data: {new Date(Number(`${boleia.date.seconds}000`)).toLocaleString('PT-PT')}</div>
+                                        {profile
+                                            .filter(perfil => {
+                                                return perfil.email === boleia.user;
+                                            })
+                                            .map(perfil => {
+                                                return (
+                                                    <div id="ItemUser" key={perfil.email}>
+                                                        Utilizador:{perfil.username}
+                                                    </div>
+                                                );
+                                            })}
+                                        <div id="ItemDate">Data: {new Date(Number(`${boleia.date.seconds}000`)).toLocaleString('PT-PT')}</div>
                                         <div>Local para apanhar:{boleia.pickuplocation}</div>
                                         <div>Destino:{boleia.destination}</div>
                                     </li>
@@ -174,10 +195,21 @@ function Home() {
                                 .map(viagem => {
                                     return (
                                         <li className="list-group-item" key={viagem.id}>
-                                            <div>Utilizador:{viagem.user}</div>
-                                            <div>Data: {new Date(Number(`${viagem.date.seconds}000`)).toLocaleString('PT-PT')}</div>
-                                            <div>Ponto de partida:{viagem.startingpoint}</div>
-                                            <div>Destino:{viagem.destination}</div>
+                                            {profile
+                                                .filter(perfil => {
+                                                    return perfil.email === viagem.user;
+                                                })
+                                                .map(perfil => {
+                                                    return (
+                                                        <div id="ItemUser" key={perfil.email}>
+                                                            Utilizador:{perfil.username}
+                                                        </div>
+                                                    );
+                                                })}
+                                            <div id="ItemDate">Data: {new Date(Number(`${viagem.date.seconds}000`)).toLocaleString('PT-PT')}</div>
+                                            <div id="ItemStartingPoint">
+                                                Percurso:{viagem.startingpoint} - {viagem.destination}
+                                            </div>
                                             <div>
                                                 Lugares:{viagem.BoleiasPedidos.length + 1}/{viagem.seatingcapacity}
                                             </div>
@@ -207,8 +239,18 @@ function Home() {
                                 .map(boleia => {
                                     return (
                                         <li className="list-group-item" key={boleia.id}>
-                                            <div>Utilizador:{boleia.user}</div>
-                                            <div>Data:{new Date(Number(`${boleia.date.seconds}000`)).toLocaleString('PT-PT')}</div>
+                                            {profile
+                                                .filter(perfil => {
+                                                    return perfil.email === boleia.user;
+                                                })
+                                                .map(perfil => {
+                                                    return (
+                                                        <div id="ItemUser" key={perfil.email}>
+                                                            Utilizador:{perfil.username}
+                                                        </div>
+                                                    );
+                                                })}
+                                            <div id="ItemDate">Data:{new Date(Number(`${boleia.date.seconds}000`)).toLocaleString('PT-PT')}</div>
                                             <div>Local para apanhar:{boleia.pickuplocation}</div>
                                             <div>Destino:{boleia.destination}</div>
                                         </li>

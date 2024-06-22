@@ -84,8 +84,11 @@ function OfferRide() {
                 duration: 10000
             });
         } catch (ex) {
-            // eslint-disable-next-line no-console
-            console.log(ex);
+            toast.show({
+                title: 'Erro',
+                content: 'Dados mal introduzidos',
+                duration: 10000
+            });
         }
     };
 

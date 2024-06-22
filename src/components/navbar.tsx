@@ -59,9 +59,17 @@ function NavBar({ brandName, imageSrcPath }: NavBarProps) {
                     Read: true
                 });
             }
+            toast.show({
+                title: 'Notificação lida',
+                content: 'Notificação marcada como lida',
+                duration: 10000
+            });
         } catch (ex) {
-            // eslint-disable-next-line no-console
-            console.log(ex);
+            toast.show({
+                title: 'Erro',
+                content: 'Notificação não marcada como lida',
+                duration: 10000
+            });
         }
     };
 

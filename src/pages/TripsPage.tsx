@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable no-console */
 //@ts-nocheck
-import React from 'react';
 import { v4 as uuid } from 'uuid';
-import { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
     collection,
     query,
@@ -122,9 +121,17 @@ function Trips() {
                     ViagensOferecidas: arrayRemove(viagemdopedido.id)
                 });
             }
+            toast.show({
+                title: 'Mundança guardada',
+                content: 'Viagem guardada no pedido de boleia',
+                duration: 10000
+            });
         } catch (ex) {
-            // eslint-disable-next-line no-console
-            console.log(ex);
+            toast.show({
+                title: 'Erro',
+                content: 'Mudança no pedido não guardada',
+                duration: 10000
+            });
         }
         try {
             const grupoteste = query(ListaViagens, where('id', '==', viagemdopedido.id));
@@ -144,9 +151,17 @@ function Trips() {
                     PedidosRecebidos: arrayRemove(boleia.id)
                 });
             }
+            toast.show({
+                title: 'Mudança guardada',
+                content: 'Pedido de boleia incluído na viagem',
+                duration: 10000
+            });
         } catch (ex) {
-            // eslint-disable-next-line no-console
-            console.log(ex);
+            toast.show({
+                title: 'Erro',
+                content: 'Mudança no pedido não guardada',
+                duration: 10000
+            });
         }
         try {
             await addDoc(NotificationsList, {
@@ -196,20 +211,23 @@ function Trips() {
                     PedidosRecebidos: arrayRemove(boleia.id)
                 });
             }
+            toast.show({
+                title: 'Pedido rejeitado',
+                content: 'Pedido de boleia removido da viagem',
+                duration: 10000
+            });
         } catch (ex) {
-            // eslint-disable-next-line no-console
-            console.log(ex);
+            toast.show({
+                title: 'Erro',
+                content: 'Mudança no pedido não guardada',
+                duration: 10000
+            });
         }
         await addDoc(NotificationsList, {
             email: boleia.user,
             Mensagem: 'O utilizador ${viagemdopedido.user} rejeitou o seu pedido de boleia',
             id: uuid(),
             Read: false
-        });
-        toast.show({
-            title: 'Pedido rejeitado',
-            content: 'Pedido de boleia rejeitado',
-            duration: 10000
         });
     };
 
@@ -283,8 +301,11 @@ function Trips() {
                 });
             }
         } catch (ex) {
-            // eslint-disable-next-line no-console
-            console.log(ex);
+            toast.show({
+                title: 'Erro',
+                content: 'Falha na remoção da viagem do pedido de boleia',
+                duration: 10000
+            });
         }
         try {
             const grupoteste = query(ListaViagens, where('id', '==', viagemid));
@@ -303,20 +324,23 @@ function Trips() {
                     BoleiasPedidos: arrayRemove(boleiaid)
                 });
             }
+            toast.show({
+                title: 'Passageiro removido',
+                content: 'Passageiro foi removido da tua viagem',
+                duration: 10000
+            });
         } catch (ex) {
-            // eslint-disable-next-line no-console
-            console.log(ex);
+            toast.show({
+                title: 'Erro',
+                content: 'Falha na remoção do passageiro da viagem',
+                duration: 10000
+            });
         }
         await addDoc(NotificationsList, {
             email: boleia.user,
             Message: 'O utilizador  ${viagemdopedido.user} removeu-o da sua viagem',
             id: uuid(),
             Read: false
-        });
-        toast.show({
-            title: 'Passageiro removido',
-            content: 'Passageiro foi removido da tua viagem',
-            duration: 10000
         });
     };
 
@@ -355,8 +379,11 @@ function Trips() {
                 });
             }
         } catch (ex) {
-            // eslint-disable-next-line no-console
-            console.log(ex);
+            toast.show({
+                title: 'Erro',
+                content: 'Falha a guardar o pedido na viagem',
+                duration: 10000
+            });
         }
         try {
             const grupoteste = query(ListaViagens, where('id', '==', viagemid));
@@ -375,20 +402,23 @@ function Trips() {
                     PedidosBoleia: arrayUnion(boleiaid)
                 });
             }
+            toast.show({
+                title: 'Oferta aceite',
+                content: 'Faz parte da viagem na oferta',
+                duration: 10000
+            });
         } catch (ex) {
-            // eslint-disable-next-line no-console
-            console.log(ex);
+            toast.show({
+                title: 'Erro',
+                content: 'Falha a guardar a oferta no pedido',
+                duration: 10000
+            });
         }
         await addDoc(NotificationsList, {
             email: viagem.user,
             Message: 'O utilizador ${viagemdopedido.user} aceitou a sua oferta de boleia',
             id: uuid(),
             Read: false
-        });
-        toast.show({
-            title: 'Oferta aceite',
-            content: 'Faz parte da viagem na oferta',
-            duration: 10000
         });
     };
 
@@ -425,20 +455,23 @@ function Trips() {
                     ViagensOferecidas: arrayRemove(viagemid)
                 });
             }
+            toast.show({
+                title: 'Oferta rejeitada',
+                content: 'Não entrou na viagem',
+                duration: 10000
+            });
         } catch (ex) {
-            // eslint-disable-next-line no-console
-            console.log(ex);
+            toast.show({
+                title: 'Erro',
+                content: 'Falha a guardar a rejeição da oferta',
+                duration: 10000
+            });
         }
         await addDoc(NotificationsList, {
             email: viagem.user,
             Message: 'O utilizador ${viagemdopedido.user} rejeitou a sua oferta de boleia',
             id: uuid(),
             Read: false
-        });
-        toast.show({
-            title: 'Oferta rejeitada',
-            content: 'Não entrou na viagem',
-            duration: 10000
         });
     };
 
@@ -499,8 +532,11 @@ function Trips() {
                 });
             }
         } catch (ex) {
-            // eslint-disable-next-line no-console
-            console.log(ex);
+            toast.show({
+                title: 'Erro',
+                content: 'Falha a remover a viagem do pedido',
+                duration: 10000
+            });
         }
         try {
             const grupoteste = query(ListaViagens, where('id', '==', viagemid));
@@ -556,9 +592,17 @@ function Trips() {
 
                     await deleteDoc(docRef);
                 }
+                toast.show({
+                    title: 'Viagem removida',
+                    content: 'Viagem já não faz parte da tua lista',
+                    duration: 10000
+                });
             } catch (ex) {
-                // eslint-disable-next-line no-console
-                console.log(ex);
+                toast.show({
+                    title: 'Erro',
+                    content: 'Falha a remover a viagem',
+                    duration: 10000
+                });
             }
         }
         if (tipo === 'PedidosBoleia próprios') {
@@ -577,15 +621,18 @@ function Trips() {
 
                     await deleteDoc(docRef);
                 }
+                toast.show({
+                    title: 'Boleia apagada',
+                    content: 'Boleia foi apagada',
+                    duration: 10000
+                });
             } catch (ex) {
-                // eslint-disable-next-line no-console
-                console.log(ex);
+                toast.show({
+                    title: 'Erro',
+                    content: 'Falha ao remover pedido de boleia',
+                    duration: 10000
+                });
             }
-            toast.show({
-                title: 'Boleia apagada',
-                content: 'Boleia foi apagada',
-                duration: 10000
-            });
         }
     };
 

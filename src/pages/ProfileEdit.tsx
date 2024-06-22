@@ -55,9 +55,17 @@ function ProfileEdit() {
                     username: username
                 });
             }
+            toast.show({
+                title: 'Perfil guardado',
+                content: 'Mudanças ao perfil guardadas com sucesso',
+                duration: 10000
+            });
         } catch (ex) {
-            // eslint-disable-next-line no-console
-            console.log(ex);
+            toast.show({
+                title: 'Erro',
+                content: 'Falha ao guardar mudanças do perfil',
+                duration: 10000
+            });
         }
     };
 
@@ -104,8 +112,11 @@ function ProfileEdit() {
                     });
                 })
                 .catch(error => {
-                    // An error ocurred
-                    // ...
+                    toast.show({
+                        title: 'Erro',
+                        content: 'Falha a apagar conta',
+                        duration: 10000
+                    });
                 });
         } catch (ex) {
             toast.show({
