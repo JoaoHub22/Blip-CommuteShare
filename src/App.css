@@ -39,3 +39,20 @@
     height: 100px;
     object-fit: contain;
   }
+
+#ContainerNotifications{
+  width:400px;
+}
+
+  #ListNotifications{
+    width:300px;
+  }
+
+  #NotificationPopUp{
+    width:500px;
+  }
+
+  .button{
+    border-radius: 0.375rem;
+}
+

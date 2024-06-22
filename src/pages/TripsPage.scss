@@ -8,13 +8,15 @@
 }
 
 #listaPedidos{
+    top:220px;
     position:absolute;
-    left: 1050px;
+    left: 1010px;
 }
 
 #listaPedidos2{
     position:absolute;
-    left: 600px;
+    left: 585px;
+    top:220px;
 }
 
 .list-group{
@@ -24,11 +26,44 @@
     overflow-y: auto;
 }
 
-.button{
-    border-radius: 0.375rem;
-}
-
 #Map{
     height: 500px;
     width: 80%;
+}
+
+#ItemUser{
+    font-style: italic;
+    font-size: large;
+}
+
+#ItemDate{
+    font-style: oblique;
+}
+
+#ItemStartingPoint{
+font-weight: 500;
+}
+
+#ItemDestination{
+    font-weight: 500;
+}
+
+#ItemSeatingCapacity{
+
+}
+
+#ItemPickupLocation{
+    font-weight: 500;
+}
+
+#titulo1{
+    bottom:500px;
+    position:absolute;
+    left: 1025px;
+}
+
+#titulo2{
+    position:absolute;
+    left: 600px;
+    bottom:500px;
 }

@@ -2,8 +2,22 @@
 /* eslint-disable no-console */
 //@ts-nocheck
 import React from 'react';
+import { v4 as uuid } from 'uuid';
 import { useContext, useEffect, useState } from 'react';
-import { collection, query, where, deleteDoc, getDocs, getFirestore, onSnapshot, arrayRemove, doc } from 'firebase/firestore';
+import {
+    collection,
+    query,
+    where,
+    deleteDoc,
+    getDocs,
+    updateDoc,
+    arrayUnion,
+    getFirestore,
+    onSnapshot,
+    arrayRemove,
+    doc,
+    addDoc
+} from 'firebase/firestore';
 import { Link, useNavigate } from 'react-router-dom';
 import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
@@ -55,8 +69,8 @@ function Trips() {
     const ListaViagens = collection(firestore, 'Viagens');
     const ListaPedidosBoleia = collection(firestore, 'PedidosBoleia');
     const ProfileList = collection(firestore, 'Profiles');
+    const NotificationsList = collection(firestore, 'Notifications');
     const [Destinationfilter, setDestinationFilter] = useState('');
-    const [Userfilter, setUserFilter] = useState('');
     const [StartingPointfilter, setStartingPointFilter] = useState('');
     const [PickupLocationfilter, setPickupLocationFilter] = useState('');
     const [Mostrarpedidos, setMostrarpedidos] = useState(false);
@@ -74,15 +88,15 @@ function Trips() {
         setMostrarOfertas(false);
     };
 
-    const AceitarPedido = async boleiaid => {
+    const AceitarPedido = async boleia => {
         let i = 0;
         let foundtrip = false;
-        let viagemid = '';
+        let viagemdopedido = null;
 
         viagens.forEach(viagem => {
             while (i < viagem.PedidosRecebidos.length && foundtrip === false) {
-                if (boleiaid === viagem.PedidosRecebidos[i]) {
-                    viagemid = viagem.id;
+                if (boleia.id === viagem.PedidosRecebidos[i]) {
+                    viagemdopedido = viagem;
 
                     foundtrip = true;
                 }
@@ -92,7 +106,7 @@ function Trips() {
         });
 
         try {
-            const grupoteste = query(ListaPedidosBoleia, where('id', '==', boleiaid));
+            const grupoteste = query(ListaPedidosBoleia, where('id', '==', boleia.id));
             const querySnapshot = await getDocs(grupoteste);
 
             let docID = null;
@@ -104,7 +118,8 @@ function Trips() {
                 const docRef = doc(ListaPedidosBoleia, docID);
 
                 await updateDoc(docRef, {
-                    ViagemAceite: viagemid
+                    ViagemAceite: viagemdopedido.id,
+                    ViagensOferecidas: arrayRemove(viagemdopedido.id)
                 });
             }
         } catch (ex) {
@@ -112,7 +127,7 @@ function Trips() {
             console.log(ex);
         }
         try {
-            const grupoteste = query(ListaViagens, where('id', '==', viagemid));
+            const grupoteste = query(ListaViagens, where('id', '==', viagemdopedido.id));
             const querySnapshot = await getDocs(grupoteste);
 
             let docID = null;
@@ -125,24 +140,36 @@ function Trips() {
                 const docRef = doc(ListaViagens, docID);
 
                 await updateDoc(docRef, {
-                    PedidosBoleia: arrayUnion(boleiaid),
-                    PedidosRecebidos: arrayRemove(boleiaid)
+                    BoleiasPedidos: arrayUnion(boleia.id),
+                    PedidosRecebidos: arrayRemove(boleia.id)
                 });
             }
         } catch (ex) {
             // eslint-disable-next-line no-console
             console.log(ex);
         }
+        try {
+            await addDoc(NotificationsList, {
+                email: boleia.user,
+                Mensagem: 'O utilizador  ${viagemdopedido.user} aceitou o seu pedido de boleia',
+                id: uuid(),
+                Read: false
+            });
+            // }
+        } catch (ex) {
+            // eslint-disable-next-line no-console
+            console.log(ex);
+        }
     };
 
-    const RejeitarPedido = async boleiaid => {
+    const RejeitarPedido = async boleia => {
         let i = 0;
         let foundtrip = false;
         let viagemid = '';
 
         viagens.forEach(viagem => {
             while (i < viagem.PedidosRecebidos.length && foundtrip === false) {
-                if (boleiaid === viagem.PedidosRecebidos[i]) {
+                if (boleia.id === viagem.PedidosRecebidos[i]) {
                     viagemid = viagem.id;
 
                     foundtrip = true;
@@ -166,13 +193,19 @@ function Trips() {
                 const docRef = doc(ListaViagens, docID);
 
                 await updateDoc(docRef, {
-                    PedidosRecebidos: arrayRemove(boleiaid)
+                    PedidosRecebidos: arrayRemove(boleia.id)
                 });
             }
         } catch (ex) {
             // eslint-disable-next-line no-console
             console.log(ex);
         }
+        await addDoc(NotificationsList, {
+            email: boleia.user,
+            Mensagem: 'O utilizador ${viagemdopedido.user} rejeitou o seu pedido de boleia',
+            id: uuid(),
+            Read: false
+        });
         toast.show({
             title: 'Pedido rejeitado',
             content: 'Pedido de boleia rejeitado',
@@ -186,6 +219,7 @@ function Trips() {
         const listaaceites: DetalhesBoleia[] = [];
         const listapedidos: DetalhesBoleia[] = [];
 
+        console.log(viagem);
         let i = 0;
 
         boleias.forEach(boleia => {
@@ -198,7 +232,8 @@ function Trips() {
             i = 0;
             while (i < pedidosboleiasid.length) {
                 if (boleia.id === pedidosboleiasid[i]) {
-                    listapedidos.push(boleias[i]);
+                    listapedidos.push(pedidosboleiasid[i]);
+                    console.log(pedidosboleiasid.length);
                 }
                 i = i + 1;
             }
@@ -210,6 +245,8 @@ function Trips() {
 
         setPedidosAceites(listaaceites);
         setPedidosPorResponder(listapedidos);
+        console.log(listaaceites);
+        console.log(listapedidos);
     };
 
     const RemoverPassageiro = async boleiaid => {
@@ -270,6 +307,12 @@ function Trips() {
             // eslint-disable-next-line no-console
             console.log(ex);
         }
+        await addDoc(NotificationsList, {
+            email: boleia.user,
+            Message: 'O utilizador  ${viagemdopedido.user} removeu-o da sua viagem',
+            id: uuid(),
+            Read: false
+        });
         toast.show({
             title: 'Passageiro removido',
             content: 'Passageiro foi removido da tua viagem',
@@ -284,7 +327,7 @@ function Trips() {
 
         boleias.forEach(boleia => {
             while (i < boleia.ViagensOferecidas.length && foundrequest === false) {
-                if (boleiaid === boleia.ViagensOferecidas[i]) {
+                if (viagemid === boleia.ViagensOferecidas[i]) {
                     boleiaid = boleia.id;
 
                     foundrequest = true;
@@ -336,6 +379,12 @@ function Trips() {
             // eslint-disable-next-line no-console
             console.log(ex);
         }
+        await addDoc(NotificationsList, {
+            email: viagem.user,
+            Message: 'O utilizador ${viagemdopedido.user} aceitou a sua oferta de boleia',
+            id: uuid(),
+            Read: false
+        });
         toast.show({
             title: 'Oferta aceite',
             content: 'Faz parte da viagem na oferta',
@@ -380,6 +429,12 @@ function Trips() {
             // eslint-disable-next-line no-console
             console.log(ex);
         }
+        await addDoc(NotificationsList, {
+            email: viagem.user,
+            Message: 'O utilizador ${viagemdopedido.user} rejeitou a sua oferta de boleia',
+            id: uuid(),
+            Read: false
+        });
         toast.show({
             title: 'Oferta rejeitada',
             content: 'Não entrou na viagem',
@@ -410,14 +465,14 @@ function Trips() {
         setMostrarOfertas(true);
     };
 
-    const SairDaViagem = async viagemid => {
+    const SairDaViagem = async viagem => {
         let i = 0;
         let foundrequest = false;
         let boleiaid = '';
 
         boleias.forEach(boleia => {
-            while (i < boleia.ViagensOferecidas.length && foundrequest === false) {
-                if (boleiaid === boleia.ViagensOferecidas[i]) {
+            while (foundrequest === false) {
+                if (viagem.id === boleia.ViagensOferecidas[i]) {
                     boleiaid = boleia.id;
 
                     foundrequest = true;
@@ -464,15 +519,24 @@ function Trips() {
                     BoleiasPedidos: arrayRemove(boleiaid)
                 });
             }
+            await addDoc(NotificationsList, {
+                email: boleia.user,
+                Message: 'O utilizador  ${viagemdopedido.user} removeu-o da sua viagem',
+                id: uuid(),
+                Read: false
+            });
+            toast.show({
+                title: 'Saiu da viagem',
+                content: 'Não faz parte da viagem',
+                duration: 10000
+            });
         } catch (ex) {
-            // eslint-disable-next-line no-console
-            console.log(ex);
+            toast.show({
+                title: 'Erro',
+                content: 'Falha a sair da viagem',
+                duration: 10000
+            });
         }
-        toast.show({
-            title: 'Saiu da viagem',
-            content: 'Não faz parte da viagem',
-            duration: 10000
-        });
     };
 
     const Delete = async id => {
@@ -586,17 +650,12 @@ function Trips() {
             };
         };
 
-        // const loadMap = async () => {
-        //     const resp = await fetch(`https://graphhopper.com/api/1/vrp?key=[980d2455-51e2-450e-be0c-958a2b6c7dbc]`, { method: 'POST' });
-        // };
-
         if (!currentUser) {
             navigate('/Login');
         } else {
             handleGetViagens();
             handleGetPedidosBoleia();
             handleGetProfile();
-            loadMap();
         }
     }, [currentUser, navigate]);
 
@@ -604,14 +663,6 @@ function Trips() {
         <div className="container">
             <h3>Viagens</h3>
             <Popup trigger={<button className="button">Filtro</button>} position="right center">
-                <div>Utilizador</div>
-                <input
-                    type="search"
-                    className="form-control"
-                    onChange={e => setUserFilter(e.currentTarget.value)}
-                    placeholder="Search..."
-                    aria-label="Search"
-                ></input>
                 <div>Ponto de Partida</div>
                 <input
                     type="search"
@@ -670,19 +721,18 @@ function Trips() {
                                         <li className="list-group-item" key={viagem.id}>
                                             {Profiles.filter(perfil => {
                                                 return perfil.email === viagem.user;
-                                            })
-                                                .filter(perfil => {
-                                                    if (Userfilter != '') {
-                                                        return perfil.username.includes(Userfilter);
-                                                    } else return perfil;
-                                                })
-                                                .map(perfil => {
-                                                    return <div key={perfil.email}>Utilizador:{perfil.username}</div>;
-                                                })}
-                                            <div>Data: {new Date(Number(`${viagem.date.seconds}000`)).toLocaleString('PT-PT')}</div>
-                                            <div>Ponto de partida:{viagem.startingpoint}</div>
-                                            <div>Destino:{viagem.destination}</div>
-                                            <div>
+                                            }).map(perfil => {
+                                                return (
+                                                    <div id="ItemUser" key={perfil.email}>
+                                                        Utilizador:{perfil.username}
+                                                    </div>
+                                                );
+                                            })}
+                                            <div id="ItemDate">Data: {new Date(Number(`${viagem.date.seconds}000`)).toLocaleString('PT-PT')}</div>
+                                            <div id="ItemStartingPoint">
+                                                Percurso: {viagem.startingpoint}-{viagem.destination}
+                                            </div>
+                                            <div id="ItemSeatingCapacity">
                                                 Lugares:{viagem.BoleiasPedidos.length + 1}/{viagem.seatingcapacity}
                                             </div>
                                             {viagem.BoleiasPedidos.length + 1 < viagem.seatingcapacity && viagem.user != currentUser.email && (
@@ -690,6 +740,9 @@ function Trips() {
                                                     <button className="button">Pedir boleia</button>
                                                 </Link>
                                             )}
+                                            <Link to="/Perfil" state={viagem.user}>
+                                                <button className="button">Ver Perfil</button>
+                                            </Link>
                                         </li>
                                     );
                                 })}
@@ -720,15 +773,26 @@ function Trips() {
                                 .map(boleia => {
                                     return (
                                         <li className="list-group-item" key={boleia.id}>
-                                            <div>Utilizador:{boleia.user}</div>
-                                            <div>Data: {new Date(Number(`${boleia.date.seconds}000`)).toLocaleString('PT-PT')}</div>
-                                            <div>Local para apanhar:{boleia.pickuplocation}</div>
+                                            {Profiles.filter(perfil => {
+                                                return perfil.email === boleia.user;
+                                            }).map(perfil => {
+                                                return (
+                                                    <div id="ItemUser" key={perfil.email}>
+                                                        Utilizador:{perfil.username}
+                                                    </div>
+                                                );
+                                            })}
+                                            <div id="ItemDate">Data: {new Date(Number(`${boleia.date.seconds}000`)).toLocaleString('PT-PT')}</div>
+                                            <div id="ItemPickupLocation">Local para apanhar:{boleia.pickuplocation}</div>
                                             <div>Destino:{boleia.destination}</div>
                                             {boleia.ViagemAceite === '' && boleia.user != currentUser.email && (
                                                 <Link to="/OferecerBoleia" state={boleia}>
                                                     <button className="button">Oferecer boleia</button>
                                                 </Link>
                                             )}
+                                            <Link to="/Perfil" state={boleia.user}>
+                                                <button className="button">Ver Perfil</button>
+                                            </Link>
                                         </li>
                                     );
                                 })}
@@ -763,8 +827,16 @@ function Trips() {
                                 .map(viagem => {
                                     return (
                                         <li className="list-group-item" key={viagem.id}>
-                                            <div>Utilizador:{viagem.user}</div>
-                                            <div>Data: {new Date(Number(`${viagem.date.seconds}000`)).toLocaleString('PT-PT')}</div>
+                                            {Profiles.filter(perfil => {
+                                                return perfil.email === viagem.user;
+                                            }).map(perfil => {
+                                                return (
+                                                    <div id="ItemUser" key={perfil.email}>
+                                                        Utilizador:{perfil.username}
+                                                    </div>
+                                                );
+                                            })}
+                                            <div id="ItemDate">Data: {new Date(Number(`${viagem.date.seconds}000`)).toLocaleString('PT-PT')}</div>
                                             <div>Ponto de partida:{viagem.startingpoint}</div>
                                             <div>Destino:{viagem.destination}</div>
                                             <div>
@@ -813,8 +885,16 @@ function Trips() {
                                 .map(boleia => {
                                     return (
                                         <li className="list-group-item" key={boleia.id}>
-                                            <div>Utilizador:{boleia.user}</div>
-                                            <div>Data:{new Date(Number(`${boleia.date.seconds}000`)).toLocaleString('PT-PT')}</div>
+                                            {Profiles.filter(perfil => {
+                                                return perfil.email === boleia.user;
+                                            }).map(perfil => {
+                                                return (
+                                                    <div id="ItemUser" key={perfil.email}>
+                                                        Utilizador:{perfil.username}
+                                                    </div>
+                                                );
+                                            })}
+                                            <div id="ItemDate">Data:{new Date(Number(`${boleia.date.seconds}000`)).toLocaleString('PT-PT')}</div>
                                             <div>Local para apanhar:{boleia.pickuplocation}</div>
                                             <div>Destino:{boleia.destination}</div>
                                             <Link to="/Editar/Boleia" state={boleia}>
@@ -825,11 +905,10 @@ function Trips() {
                                             <button className="button" onClick={() => Delete(boleia.id)}>
                                                 Apagar
                                             </button>
-                                            {boleia.ViagemAceite != '' && (
-                                                <button className="button" onClick={() => OfertasBoleia(boleia)}>
-                                                    Mostrar ofertas de boleia
-                                                </button>
-                                            )}
+
+                                            <button className="button" onClick={() => OfertasBoleia(boleia)}>
+                                                Mostrar ofertas de boleia
+                                            </button>
                                         </li>
                                     );
                                 })}
@@ -844,8 +923,8 @@ function Trips() {
             )}
             {Mostrarpedidos && (
                 <>
+                    <h3 id="titulo1">Pedidos de boleia aceites</h3>
                     <div className="container" id="listaPedidos">
-                        <h3>Pedidos de boleia por aceitar</h3>
                         {!isLoading && (
                             <ul className="list-group">
                                 {boleias
@@ -863,11 +942,19 @@ function Trips() {
                                     .map(boleia => {
                                         return (
                                             <li className="list-group-item" key={boleia.id}>
-                                                <div>Utilizador:{boleia.user}</div>
-                                                <div>Data:{new Date(Number(`${boleia.date.seconds}000`)).toLocaleString('PT-PT')}</div>
+                                                {Profiles.filter(perfil => {
+                                                    return perfil.email === boleia.user;
+                                                }).map(perfil => {
+                                                    return (
+                                                        <div id="ItemUser" key={perfil.email}>
+                                                            Utilizador:{perfil.username}
+                                                        </div>
+                                                    );
+                                                })}
+                                                <div id="ItemDate">Data:{new Date(Number(`${boleia.date.seconds}000`)).toLocaleString('PT-PT')}</div>
                                                 <div>Local para apanhar:{boleia.pickuplocation}</div>
                                                 <div>Destino:{boleia.destination}</div>
-                                                <button className="button" onClick={RemoverPassageiro(boleia.id)}>
+                                                <button className="button" onClick={() => RemoverPassageiro(boleia.id)}>
                                                     Remover passageiro
                                                 </button>
                                             </li>
@@ -881,8 +968,8 @@ function Trips() {
                             </div>
                         )}
                     </div>
+                    <h3 id="titulo2">Pedidos de boleia por verificar</h3>
                     <div className="container" id="listaPedidos2">
-                        <h3>Pedidos de boleia por verificar</h3>
                         {!isLoading && (
                             <ul className="list-group">
                                 {boleias
@@ -900,14 +987,22 @@ function Trips() {
                                     .map(boleia => {
                                         return (
                                             <li className="list-group-item" key={boleia.id}>
-                                                <div>Utilizador:{boleia.user}</div>
+                                                {Profiles.filter(perfil => {
+                                                    return perfil.email === boleia.user;
+                                                }).map(perfil => {
+                                                    return (
+                                                        <div id="ItemUser" key={perfil.email}>
+                                                            Utilizador:{perfil.username}
+                                                        </div>
+                                                    );
+                                                })}
                                                 <div>Data:{new Date(Number(`${boleia.date.seconds}000`)).toLocaleString('PT-PT')}</div>
                                                 <div>Local para apanhar:{boleia.pickuplocation}</div>
                                                 <div>Destino:{boleia.destination}</div>
-                                                <button className="button" onClick={AceitarPedido(boleia.id)}>
+                                                <button className="button" onClick={() => AceitarPedido(boleia)}>
                                                     Aceitar pedido
                                                 </button>
-                                                <button className="button" onClick={RejeitarPedido(boleia.id)}>
+                                                <button className="button" onClick={() => RejeitarPedido(boleia)}>
                                                     Rejeitar pedido
                                                 </button>
                                             </li>
@@ -925,8 +1020,8 @@ function Trips() {
             )}
             {MostrarOfertas && (
                 <>
+                    <h3 id="titulo1">Viagem aceite</h3>
                     <div className="container" id="listaPedidos">
-                        <h3>Viagem aceite</h3>
                         {!isLoading && (
                             <ul className="list-group">
                                 {viagens
@@ -936,14 +1031,24 @@ function Trips() {
                                     .map(viagem => {
                                         return (
                                             <li className="list-group-item" key={viagem.id}>
-                                                <div>Utilizador:{viagem.user}</div>
-                                                <div>Data: {new Date(Number(`${viagem.date.seconds}000`)).toLocaleString('PT-PT')}</div>
-                                                <div>Ponto de partida:{viagem.startingpoint}</div>
-                                                <div>Destino:{viagem.destination}</div>
-                                                <div>
+                                                {Profiles.filter(perfil => {
+                                                    return perfil.email === viagem.user;
+                                                }).map(perfil => {
+                                                    return (
+                                                        <div id="ItemUser" key={perfil.email}>
+                                                            Utilizador:{perfil.username}
+                                                        </div>
+                                                    );
+                                                })}
+                                                <div id="ItemDate">Data: {new Date(Number(`${viagem.date.seconds}000`)).toLocaleString('PT-PT')}</div>
+                                                <div id="ItemStartingPoint">
+                                                    Percurso:{viagem.startingpoint}-{viagem.destination}
+                                                </div>
+
+                                                <div id="ItemSeatingCapacity">
                                                     Lugares:{viagem.BoleiasPedidos.length + 1}/{viagem.seatingcapacity}
                                                 </div>
-                                                <button className="button" onClick={SairDaViagem(viagem.id)}>
+                                                <button className="button" onClick={() => SairDaViagem(viagem.id)}>
                                                     Sair de viagem
                                                 </button>
                                             </li>
@@ -957,8 +1062,8 @@ function Trips() {
                             </div>
                         )}
                     </div>
+                    <h3 id="titulo2">Ofertas oferecidas</h3>
                     <div className="container" id="listaPedidos2">
-                        <h3>Ofertas oferecidas</h3>
                         {!isLoading && (
                             <ul className="list-group">
                                 {viagens
@@ -975,17 +1080,26 @@ function Trips() {
                                     .map(viagem => {
                                         return (
                                             <li className="list-group-item" key={viagem.id}>
-                                                <div>Utilizador:{viagem.user}</div>
+                                                {Profiles.filter(perfil => {
+                                                    return perfil.email === viagem.user;
+                                                }).map(perfil => {
+                                                    return (
+                                                        <div id="ItemUser" key={perfil.email}>
+                                                            Utilizador:{perfil.username}
+                                                        </div>
+                                                    );
+                                                })}
                                                 <div>Data: {new Date(Number(`${viagem.date.seconds}000`)).toLocaleString('PT-PT')}</div>
-                                                <div>Ponto de partida:{viagem.startingpoint}</div>
-                                                <div>Destino:{viagem.destination}</div>
+                                                <div>
+                                                    Percurso:{viagem.startingpoint}-{viagem.destination}
+                                                </div>
                                                 <div>
                                                     Lugares:{viagem.BoleiasPedidos.length + 1}/{viagem.seatingcapacity}
                                                 </div>
-                                                <button className="button" onClick={AceitarOferta(viagem.id)}>
+                                                <button className="button" onClick={() => AceitarOferta(viagem.id)}>
                                                     Aceitar oferta
                                                 </button>
-                                                <button className="button" onClick={RejeitarOferta(viagem.id)}>
+                                                <button className="button" onClick={() => RejeitarOferta(viagem.id)}>
                                                     Rejeitar oferta
                                                 </button>
                                             </li>

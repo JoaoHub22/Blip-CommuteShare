@@ -1,0 +1,17 @@
+#PerfilListaViagens{
+    position: relative;
+    
+}
+
+#PerfilListaBoleias{
+    position: absolute;
+    left: 700px;
+    bottom: 240px;
+}
+
+.list-group{
+    width: 400px;
+    box-sizing:border-box;
+    max-height: 400px;
+    overflow-y: auto;
+}

@@ -7,9 +7,7 @@ import { SetStateAction, useContext, useEffect, useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import { addDoc, collection, getFirestore } from 'firebase/firestore';
 import { Link, useNavigate } from 'react-router-dom';
-import { getToken } from 'firebase/messaging';
 
-import { messaging } from '../firebase.ts';
 import { toast } from '../components/toastmanager';
 import { AuthContext } from '../context/auth-context';
 
@@ -28,7 +26,6 @@ function AddTripRequest() {
     const buttons = document.querySelectorAll('.dropdown-item');
     const [date, setDate] = useState(new Date());
     const startDate = new Date();
-    const [token, setToken] = useState('');
     const [tipo, setTipo] = useState('Viagem');
     const [startingpoint, setStartingpoint] = useState('');
     const firestore = getFirestore();
@@ -39,25 +36,7 @@ function AddTripRequest() {
         if (!currentUser) {
             navigate('/Login');
         }
-        requestPermission();
     }, [currentUser, navigate]);
-
-    async function requestPermission() {
-        //requesting permission using Notification API
-        const permission = await Notification.requestPermission();
-
-        if (permission === 'granted') {
-            const token = await getToken(messaging, {
-                vapidKey: 'BHiA2ELNXhDDBRFQpAPb9A37kdtlFsP9YL1sCSGirTmY3Xi0YxfWiOxqV36upgvroFLXjR6bNZy26cbqEzdFcKk'
-            });
-
-            setToken(token);
-            //We can send token to server
-        } else if (permission === 'denied') {
-            //notifications are blocked
-            alert('You denied for the notification');
-        }
-    }
 
     const AddTrip = async () => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -75,16 +54,11 @@ function AddTripRequest() {
                     user: currentUser.email,
                     seatingcapacity: seatingcapacity
                 });
-                messaging
-                    .subscribeToTopic(token, id)
-                    .then(response => {
-                        // See the MessagingTopicManagementResponse reference documentation
-                        // for the contents of response.
-                        console.log('Successfully subscribed to topic:', response);
-                    })
-                    .catch(error => {
-                        console.log('Error subscribing to topic:', error);
-                    });
+                toast.show({
+                    title: 'Viagem adicionada',
+                    content: 'Viagem guardada com sucesso',
+                    duration: 10000
+                });
             } else {
                 toast.show({
                     title: 'Erro',

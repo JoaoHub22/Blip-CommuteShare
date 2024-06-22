@@ -3,9 +3,8 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useState, ChangeEvent, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { addDoc, collection, getFirestore } from 'firebase/firestore';
-import { getToken } from 'firebase/messaging';
 
-import { messaging, CreateAccount } from '../firebase.ts';
+import { CreateAccount } from '../firebase.ts';
 import '.././App.css';
 
 import './Register.scss';
@@ -20,6 +19,7 @@ function Register() {
     const firestore = getFirestore();
     const ListaPerfis = collection(firestore, 'Profiles');
     const [username, setUsername] = useState();
+    const [description, setDescription] = useState();
     const { email, password } = formFields;
     const navigate = useNavigate();
 
@@ -35,15 +35,10 @@ function Register() {
             const userCredential = await CreateAccount(email, password);
 
             if (userCredential) {
+                addDoc(ListaPerfis, { description: description, email: email, username: username });
                 resetFormFields();
-                navigate('/profile');
+                navigate('/Home');
             }
-
-            const token = await getToken(messaging, {
-                vapidKey: 'BHiA2ELNXhDDBRFQpAPb9A37kdtlFsP9YL1sCSGirTmY3Xi0YxfWiOxqV36upgvroFLXjR6bNZy26cbqEzdFcKk'
-            });
-
-            addDoc(ListaPerfis, { description: '', email: email, username: username, token: token });
 
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
@@ -76,6 +71,19 @@ function Register() {
                                 placeholder="Username"
                             />
                             <label htmlFor="floatingUsername">Username</label>
+                        </div>
+
+                        <div className="form-floating">
+                            <input
+                                type="username"
+                                name="username"
+                                value={description}
+                                //@ts-ignore
+                                onChange={e => setDescription(e.currentTarget.value)}
+                                className="form-control"
+                                placeholder="Description"
+                            />
+                            <label htmlFor="floatingDescription">Description</label>
                         </div>
 
                         <div className="form-floating">

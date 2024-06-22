@@ -64,8 +64,11 @@ function EditTripRequest() {
                     duration: 10000
                 });
             } catch (ex) {
-                // eslint-disable-next-line no-console
-                console.log(ex);
+                toast.show({
+                    title: 'Erro',
+                    content: 'Erro ao guardar mudanças',
+                    duration: 10000
+                });
             }
         }
         if (tipo === 'Boleia') {
@@ -95,8 +98,11 @@ function EditTripRequest() {
                     duration: 10000
                 });
             } catch (ex) {
-                // eslint-disable-next-line no-console
-                console.log(ex);
+                toast.show({
+                    title: 'Erro',
+                    content: 'Erro ao guardar mudanças',
+                    duration: 10000
+                });
             }
         }
     };

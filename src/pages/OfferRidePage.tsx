@@ -35,6 +35,7 @@ function OfferRide() {
     const dropDownButton = document.querySelector('#dropdownHere');
     const buttons = document.querySelectorAll('.dropdown-item');
     const [date, setDate] = useState(new Date());
+    const startDate = new Date();
     const [isLoading, setIsLoading] = useState(false);
     const firestore = getFirestore();
     const ListaPedidosBoleia = collection(firestore, 'PedidosBoleia');
@@ -141,7 +142,15 @@ function OfferRide() {
                     <h3>Data</h3>
                     <div>
                         {/*@ts-ignore */}
-                        <DatePicker showTimeSelect id="Date" selected={date} onChange={handleChange} />
+                        <DatePicker
+                            showTimeSelect
+                            id="Date"
+                            startDate={startDate}
+                            minDate={startDate}
+                            selected={date}
+                            onChange={handleChange}
+                            dateFormat={'d MMMM yyyy, h:mmaa'}
+                        />
                     </div>
 
                     <h3>Nº de lugares</h3>
@@ -206,13 +215,15 @@ function OfferRide() {
                     <input className="input-group" onChange={e => setDestination(e.currentTarget.value)}></input>
 
                     <Link to="/Viagens">
-                        <button id="ButConf" onClick={() => AddTrip()}>
+                        <button className="button" id="ButConf" onClick={() => AddTrip()}>
                             Confimar
                         </button>
                     </Link>
 
                     <Link to="/Viagens">
-                        <button id="ButCanc">Cancelar</button>
+                        <button className="button" id="ButCanc">
+                            Cancelar
+                        </button>
                     </Link>
                 </>
             )}
@@ -235,7 +246,9 @@ function OfferRide() {
                                             <div>
                                                 Lugares:{viagem.occupiedseats}/{viagem.seatingcapacity}
                                             </div>
-                                            <button onClick={() => SendOffer(viagem.id)}>Enviar</button>
+                                            <button className="button" onClick={() => SendOffer(viagem.id)}>
+                                                Enviar
+                                            </button>
                                         </li>
                                     );
                                 })}

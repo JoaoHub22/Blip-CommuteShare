@@ -136,6 +136,26 @@ function HistoricoViagens() {
         };
 
         handleGetPedidosBoleia();
+
+        const handleGetProfile = async () => {
+            setIsLoading(true);
+            const grupo = onSnapshot(ProfileList, querySnapshot => {
+                const items = [];
+
+                querySnapshot.forEach(doc => {
+                    items.push(doc.data());
+                });
+                //@ts-ignore
+                setProfiles(items);
+                setIsLoading(false);
+            });
+
+            return () => {
+                grupo();
+            };
+        };
+
+        handleGetProfile();
     }, [currentUser, navigate]);
 
     return (
@@ -151,7 +171,7 @@ function HistoricoViagens() {
                 <option value="PedidosBoleia">Pedidos de boleia</option>
             </select>
             {tipo == 'Viagens' && (
-                <div className="container" id="lista">
+                <div className="container" id="ListGroup">
                     {!isLoading && (
                         <ul className="list-group">
                             {viagens
@@ -161,17 +181,21 @@ function HistoricoViagens() {
                                 .map(viagem => {
                                     return (
                                         <li className="list-group-item" key={viagem.id}>
-                                            <div>Utilizador:{viagem.user}</div>
+                                            <div id="ItemUser">Utilizador:{viagem.user}</div>
 
-                                            <div>Data: {new Date(Number(`${viagem.date.seconds}000`)).toLocaleString('PT-PT')}</div>
-                                            <div>Ponto de partida:{viagem.startingpoint}</div>
-                                            <div>Destino:{viagem.destination}</div>
-                                            <div>
+                                            <div id="ItemDate">Data: {new Date(Number(`${viagem.date.seconds}000`)).toLocaleString('PT-PT')}</div>
+                                            <div id="ItemStartingPoint">
+                                                Percurso:{viagem.startingpoint}-{viagem.destination}
+                                            </div>
+
+                                            <div id="ItemSeatingCapacity">
                                                 Lugares:{viagem.BoleiasPedidos.length + 1}/{viagem.seatingcapacity}
                                             </div>
-                                            <button className="button" onClick={() => PedidosBoleia(viagem)}>
-                                                Mostrar pedidos aceites
-                                            </button>
+                                            {viagem.BoleiasPedidos.length != 0 && (
+                                                <button className="button" onClick={() => PedidosBoleia(viagem)}>
+                                                    Mostrar pedidos aceites
+                                                </button>
+                                            )}
                                         </li>
                                     );
                                 })}
@@ -185,7 +209,7 @@ function HistoricoViagens() {
                 </div>
             )}
             {tipo == 'PedidosBoleia' && (
-                <div className="container" id="lista">
+                <div className="container" id="ListGroup">
                     {!isLoading && (
                         <ul className="list-group">
                             {boleias
@@ -196,12 +220,14 @@ function HistoricoViagens() {
                                     return (
                                         <li className="list-group-item" key={boleia.id}>
                                             <div>Utilizador:{boleia.user}</div>
-                                            <div>Data: {new Date(Number(`${boleia.date.seconds}000`)).toLocaleString('PT-PT')}</div>
-                                            <div>Local para apanhar:{boleia.pickuplocation}</div>
-                                            <div>Destino:{boleia.destination}</div>
-                                            <button className="button" onClick={() => ViagemAceite(boleia.id)}>
-                                                Mostrar viagem aceite
-                                            </button>
+                                            <div id="ItemDate">Data: {new Date(Number(`${boleia.date.seconds}000`)).toLocaleString('PT-PT')}</div>
+                                            <div id="ItemPickupLocation">Local para apanhar:{boleia.pickuplocation}</div>
+                                            <div id="ItemDestination">Destino:{boleia.destination}</div>
+                                            {boleia.ViagemAceite != '' && (
+                                                <button className="button" onClick={() => ViagemAceite(boleia.id)}>
+                                                    Mostrar viagem aceite
+                                                </button>
+                                            )}
                                         </li>
                                     );
                                 })}
@@ -234,8 +260,8 @@ function HistoricoViagens() {
                                 .map(boleia => {
                                     return (
                                         <li className="list-group-item" key={boleia.id}>
-                                            <div>Utilizador:{boleia.user}</div>
-                                            <div>Data:{new Date(Number(`${boleia.date.seconds}000`)).toLocaleString('PT-PT')}</div>
+                                            <div id="ItemUser">Utilizador:{boleia.user}</div>
+                                            <div id="ItemDate">Data:{new Date(Number(`${boleia.date.seconds}000`)).toLocaleString('PT-PT')}</div>
                                             <div>Local para apanhar:{boleia.pickuplocation}</div>
                                             <div>Destino:{boleia.destination}</div>
                                         </li>
@@ -266,7 +292,7 @@ function HistoricoViagens() {
                                             <div>Data: {new Date(Number(`${viagem.date.seconds}000`)).toLocaleString('PT-PT')}</div>
                                             <div>Ponto de partida:{viagem.startingpoint}</div>
                                             <div>Destino:{viagem.destination}</div>
-                                            <div>
+                                            <div id="ItemSeatingCapacity">
                                                 Lugares:{viagem.BoleiasPedidos.length + 1}/{viagem.seatingcapacity}
                                             </div>
                                         </li>

@@ -1,5 +1,5 @@
 #listaPedidosBoleia{
-    top: 50%;
+    top: 10%;
     position:relative;
     left: 200px;
 }
@@ -12,16 +12,22 @@
 #listaViagensProprias{
     position:relative;
     left: 800px;
+    bottom:100%;
 }
 
 #listaPedidosProprios{
-    top: 50%;
+    bottom:100%;
     position:relative;
     left: 800px;
 }
 
 #username{
-    position:absolute;
-    top:135px;
+    position:relative;
+    bottom:45px;
     left:55px;
+}
+
+body{
+    box-sizing: border-box;
+    background-color: rgb(206, 226, 255);
 }

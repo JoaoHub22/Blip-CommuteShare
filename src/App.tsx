@@ -22,7 +22,7 @@ import Editar from './pages/EditPage.tsx';
 import Perfil from './pages/Profile.tsx';
 import PedirBoleia from './pages/RequestRidePage.tsx';
 import OferecerBoleia from './pages/OfferRidePage.tsx';
-import Message from './components/message.tsx';
+import PerfilEditar from './pages/ProfileEdit.tsx';
 import { AuthContext } from './context/auth-context.tsx';
 
 function App() {
@@ -30,32 +30,6 @@ function App() {
     const { currentUser } = useContext(AuthContext);
     const firestore = getFirestore();
     const Topics = collection(firestore, 'MessageTopics');
-
-    async function requestPermission() {
-        //requesting permission using Notification API
-        const permission = await Notification.requestPermission();
-
-        if (permission === 'granted') {
-            const token = await getToken(messaging, {
-                vapidKey: 'BHiA2ELNXhDDBRFQpAPb9A37kdtlFsP9YL1sCSGirTmY3Xi0YxfWiOxqV36upgvroFLXjR6bNZy26cbqEzdFcKk'
-            });
-
-            //We can send token to server
-            console.log('Token generated : ', token);
-        } else if (permission === 'denied') {
-            //notifications are blocked
-            alert('You denied for the notification');
-        }
-    }
-
-    useEffect(() => {
-        requestPermission();
-    }, []);
-
-    onMessage(messaging, payload => {
-        console.log('Chegou a Message');
-        toast(<Message notification={payload.notification} />);
-    });
 
     return (
         <>
@@ -73,6 +47,7 @@ function App() {
                 <Route path="Perfil" element={<Perfil />} />
                 <Route path="PedirBoleia" element={<PedirBoleia />} />
                 <Route path="OferecerBoleia" element={<OferecerBoleia />} />
+                <Route path="PerfilEditar" element={<PerfilEditar />} />
             </Routes>
             <br />
             <ToastContainer />

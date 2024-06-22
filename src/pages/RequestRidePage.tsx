@@ -32,7 +32,8 @@ function RequestRide() {
     const [boleias, setBoleias] = useState<DetalhesBoleia[]>([]);
     const dropDownButton = document.querySelector('#dropdownHere');
     const buttons = document.querySelectorAll('.dropdown-item');
-    const [date, setDate] = useState(new Date());
+    const [date, setDate] = useState(new Date(Number(`${location.state.date.seconds}000`)));
+    const startDate = new Date(Number(`${location.state.date.seconds}000`));
     const [IsLoading, setIsLoading] = useState(false);
     const firestore = getFirestore();
     const ListaPedidosBoleia = collection(firestore, 'PedidosBoleia');
@@ -140,7 +141,15 @@ function RequestRide() {
                     <h3>Data</h3>
                     <div>
                         {/*@ts-ignore */}
-                        <DatePicker showTimeSelect id="Date" selected={date} onChange={handleChange} />
+                        <DatePicker
+                            showTimeSelect
+                            id="Date"
+                            startDate={startDate}
+                            minDate={startDate}
+                            selected={date}
+                            onChange={handleChange}
+                            dateFormat={'d MMMM yyyy, h:mmaa'}
+                        />
                     </div>
                     <h3>Frequência</h3>
                     <div className="form-check">
@@ -201,13 +210,15 @@ function RequestRide() {
                     <input className="input-group" onChange={e => setDestination(e.currentTarget.value)}></input>
 
                     <Link to="/Viagens">
-                        <button id="ButConf" onClick={() => AddTrip()}>
+                        <button className="button" id="ButConf" onClick={() => AddTrip()}>
                             Confimar
                         </button>
                     </Link>
 
                     <Link to="/Viagens">
-                        <button id="ButCanc">Cancelar</button>
+                        <button className="button" id="ButCanc">
+                            Cancelar
+                        </button>
                     </Link>
                 </div>
             )}
@@ -227,7 +238,9 @@ function RequestRide() {
                                             <div>Data:{new Date(Number(`${boleia.date.seconds}000`)).toLocaleString('PT-PT')}</div>
                                             <div>Local para apanhar:{boleia.pickuplocation}</div>
                                             <div>Destino:{boleia.destination}</div>
-                                            <button onClick={() => SendRequest(boleia.id)}>Enviar</button>
+                                            <button className="button" onClick={() => SendRequest(boleia.id)}>
+                                                Enviar
+                                            </button>
                                         </li>
                                     );
                                 })}
